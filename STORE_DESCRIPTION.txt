@@ -1,53 +1,76 @@
-# Sugestões de Nomes:
-1. Kukoro Dungeon Helper
-2. Raid Tracker for Kukoro
-3. Dungeon Tactical Overlay
-4. Kukoro Stats Master
+# Sugestões de Nomes para a Loja:
+1. Dungeon Raid Companion for Kukoro
+2. Raid Tracker - Kukoro Tactical Tool
+3. Kukoro Dungeon Helper & Overlay
+4. Stats Tracker for Dungeon Raid
 
-# Descrição para a Loja (Chrome Web Store):
+---
+
+# Descrição para a Chrome Web Store (Cópia Direta):
 
 [PT-BR]
-Otimize sua estratégia no Kukoro Dungeon Raid com esta extensão tática definitiva! 
+Sua ferramenta tática definitiva para o modo Dungeon Raid do Kukoro! 
 
-Funcionalidades:
-- Overlay Flutuante: Uma janela arrastável e redimensionável diretamente na sua live da Twitch.
-- Captura Automática: Detecta nicks e atributos via comandos !getinfo e !kukoro em tempo real.
-- Filtros Inteligentes: Encontre jogadores com vantagens contra inimigos específicos (Aranha, Esqueleto, Dragão, etc).
-- Gestão de Vivos/Mortos: Marque jogadores eliminados com um clique para focar no que resta da raid.
-- Auto-Limpeza: Os dados expiram após 1h de inatividade ou ao marcar todos como mortos.
-- Multi-idioma: Suporte completo para Português, Inglês e Espanhol.
-- Privacidade: Funciona inteiramente no seu navegador, sem coletar dados externos.
+O Kukoro Dungeon Tracker monitora o chat da Twitch em tempo real, capturando estatísticas de jogadores e organizando-as de forma estratégica para que você nunca perca o controle da raid. Sem servidores externos — todos os dados ficam seguros no seu próprio navegador.
 
-Contato: Para bugs ou sugestões, mande um sussurro para nando_sts em https://www.twitch.tv/nando_sts
+O QUE ELA FAZ:
+- Monitoramento Inteligente: Escuta o chat e interpreta automaticamente as respostas do bot aos comandos !getinfo e !kukoro.
+- Ficha Completa: Exibe nível, defesa, agilidade, crítico e habilidades especiais de cada jogador.
+- Vantagem Tática: Identifica automaticamente contra quais inimigos (Aranha, Esqueleto, Dragão, etc.) cada jogador possui bônus, permitindo filtros dinâmicos por classe de oponente.
+- Overlay Flutuante: Uma janela opcional, arrastável e redimensionável que fica sobre a live para facilitar a consulta rápida.
+- Gestão de Sobreviventes: Marque jogadores como "Mortos" para focar apenas em quem ainda está na partida.
+- Internacionalização Total: Suporte completo para Português, Inglês e Espanhol (detecta habilidades em qualquer um desses idiomas).
+- Auto-Limpeza: Limpa os dados do canal após 1h de inatividade ou quando todos os jogadores são eliminados.
+
+PRIVACIDADE E SEGURANÇA:
+- Sem servidores externos: Suas configurações e dados de jogadores ficam armazenados apenas localmente (chrome.storage.local).
+- Foco Total: A extensão lê apenas mensagens necessárias para o funcionamento do jogo (comandos e respostas do bot).
+
+CONTATO:
+Para reportar bugs ou sugerir melhorias, envie um sussurro para nando_sts em https://www.twitch.tv/nando_sts
 
 ---
 
 [EN]
-Optimize your Kukoro Dungeon Raid strategy with the ultimate tactical extension!
+Your ultimate tactical tool for Kukoro's Dungeon Raid mode!
 
-Features:
-- Floating Overlay: A draggable and resizable window directly on your Twitch stream.
-- Auto-Capture: Detects names and attributes via !getinfo and !kukoro commands in real-time.
-- Smart Filters: Find players with advantages against specific enemies (Spider, Skeleton, Dragon, etc).
-- Life Status: Mark eliminated players with one click to focus on the remaining raid.
-- Auto-Clear: Data expires after 1h of inactivity or when all players are marked as dead.
-- Multi-language: Full support for English, Portuguese, and Spanish.
-- Privacy: Works entirely in your browser, no external data collection.
+Kukoro Dungeon Tracker monitors Twitch chat in real-time, capturing player stats and organizing them strategically so you never lose control of the raid. No external servers — all data stays secure in your own browser.
 
-Contact: For bugs or suggestions, whisper nando_sts at https://www.twitch.tv/nando_sts
+FEATURES:
+- Smart Monitoring: Listens to the chat and automatically interprets bot responses to !getinfo and !kukoro commands.
+- Comprehensive Player Profiles: Displays level, defense, agility, critical hit chance, and special skills for each player.
+- Tactical Advantage: Automatically identifies which enemies (Spider, Skeleton, Dragon, etc.) each player has bonuses against, allowing dynamic filtering by opponent class.
+- Floating Overlay: An optional, draggable, and resizable window that stays on top of the stream for quick reference.
+- Survivor Management: Mark players as "Dead" to focus only on those still in the match.
+- Full Internationalization: Complete support for English, Portuguese, and Spanish (detects skills in any of these languages).
+- Auto-Clear: Clears channel data after 1 hour of inactivity or when all players are eliminated.
+
+PRIVACY AND SECURITY:
+- No external servers: Your settings and player data are stored locally only (chrome.storage.local).
+- Pure Focus: The extension only reads messages necessary for game operation (commands and bot responses).
+
+CONTACT:
+To report bugs or suggest improvements, send a whisper to nando_sts at https://www.twitch.tv/nando_sts
 
 ---
 
 [ES]
-¡Optimiza tu estrategia en Kukoro Dungeon Raid com la extensión táctica definitiva!
+¡Tu herramienta táctica definitiva para el modo Dungeon Raid de Kukoro!
 
-Características:
-- Overlay Flotante: Una ventana arrastrable y redimensionable directamente en tu directo de Twitch.
-- Captura Automática: Detecta nombres y atributos mediante comandos !getinfo y !kukoro en tiempo real.
-- Filtros Inteligentes: Encuentra jugadores con ventajas contra enemigos específicos (Araña, Esqueleto, Dragón, etc).
-- Gestión de Vivos/Muertos: Marca a los jugadores eliminados con un clic para centrarte en el resto de la raid.
-- Limpieza Automática: Los datos caducan tras 1h de inactividad o al marcar a todos como muertos.
-- Multi-idioma: Soporte completo para Español, Inglés y Portugués.
-- Privacidad: Funciona íntegramente en tu navegador, sin recolección de datos externos.
+Kukoro Dungeon Tracker monitorea el chat de Twitch en tiempo real, capturando estadísticas de los jugadores y organizándolas estratégicamente para que nunca pierdas el control de la raid. Sin servidores externos: todos los datos permanecen seguros en tu propio navegador.
 
-Contacto: Para errores o sugerencias, envía un susurro a nando_sts en https://www.twitch.tv/nando_sts
+CARACTERÍSTICAS:
+- Monitoreo Inteligente: Escucha el chat e interpreta automáticamente las respuestas del bot a los comandos !getinfo y !kukoro.
+- Ficha Completa de Jugador: Muestra nivel, defensa, agilidad, probabilidad de crítico y habilidades especiales de cada jugador.
+- Ventaja Táctica: Identifica automáticamente contra qué enemigos (Araña, Esqueleto, Dragón, etc.) tiene bonificaciones cada jugador, permitiendo filtros dinámicos por clase de oponente.
+- Overlay Flotante: Una ventana opcional, arrastrable y redimensionable que permanece sobre el directo para una consulta rápida.
+- Gestión de Supervivientes: Marca a los jugadores como "Muertos" para centrarte solo en quienes siguen en la partida.
+- Internacionalización Total: Soporte completo para Español, Inglés y Portugués (detecta habilidades en cualquiera de estos idiomas).
+- Limpieza Automática: Borra los datos del canal tras 1 hora de inactividad o cuando todos los jugadores son eliminados.
+
+PRIVACIDAD Y SEGURIDAD:
+- Sin servidores externos: Tus ajustes y datos de jugadores se almacenan solo localmente (chrome.storage.local).
+- Enfoque Total: La extensión solo lee los mensajes necesarios para el funcionamiento del juego (comandos y respuestas del bot).
+
+CONTACTO:
+Para informar errores o sugerir mejoras, envía un susurro a nando_sts en https://www.twitch.tv/nando_sts

@@ -1,25 +1,32 @@
-# Kukoro Dungeon Tracker - Twitch Extension
+# Kukoro Dungeon Tracker - Chrome Extension
 
-Esta extensão monitora o chat da Twitch para capturar informações de jogadores no modo Dungeon do Kukoro.
+Monitor and update Kukoro Dungeon player data via Twitch chat in real-time.
 
-## Funcionalidades
-- Captura automática dos dados enviados pelo bot do Kukoro após o comando `!getinfo`.
-- Armazenamento local dos dados para consulta rápida no popup da extensão.
-- Ordenação por atualização mais recente.
-- Botão para limpar o histórico.
+## Features
+- **Floating Overlay**: A draggable and resizable window directly on your Twitch stream.
+- **Auto-Capture**: Detects names and attributes via `!getinfo` and `!kukoro` commands.
+- **Smart Filters**: Find players with advantages against specific enemies (Spider, Skeleton, Dragon, etc).
+- **Life Status Management**: Mark players as dead/alive to focus on the remaining raid.
+- **Dynamic Sorting**: Sort by Level, Name, or most recent update.
+- **Multi-language Support**: Full support for English, Portuguese, and Spanish.
+- **Privacy First**: Works entirely locally in your browser; no external servers or data collection.
 
-## Como Instalar
-1. Baixe os arquivos desta pasta.
-2. Abra o Chrome (ou navegador baseado em Chromium como Edge/Brave).
-3. Vá para `chrome://extensions/`.
-4. Ative o **Modo do Desenvolvedor** (Developer Mode) no canto superior direito.
-5. Clique em **Carregar sem compactação** (Load unpacked).
-6. Selecione a pasta onde os arquivos estão localizados.
+## Installation
+1. Download this repository as a ZIP or clone it.
+2. Open Chrome (or any Chromium-based browser like Brave, Edge, or Opera).
+3. Navigate to `chrome://extensions/`.
+4. Enable **Developer Mode** (top right corner).
+5. Click **Load unpacked** and select the folder containing these files.
 
-## Como Usar
-1. Entre em qualquer live da Twitch que esteja jogando Kukoro Dungeon.
-2. Quando alguém (ou você) digitar `!getinfo` ou `!getinfo nick`, a extensão capturará a resposta do bot.
-3. Clique no ícone da extensão para ver as estatísticas dos jogadores capturados.
+## How to Use
+1. Open any Twitch stream playing Kukoro Dungeon Raid.
+2. The extension will automatically start listening to the chat (if enabled).
+3. Open the extension popup from your browser bar to see the data or enable the **Floating Overlay**.
+4. Use `!getinfo [name]` in chat to fetch specific player data.
 
-## Nota
-A extensão funciona observando o DOM do chat da Twitch. Se a Twitch mudar significativamente a estrutura do chat, pode ser necessário atualizar os seletores no arquivo `content_script.js`.
+## Support / Contact
+If you find any bugs or have suggestions for new features:
+- **Twitch**: Whisper **nando_sts** at [twitch.tv/nando_sts](https://www.twitch.tv/nando_sts)
+
+---
+Developed with ❤️ for the Kukoro community.

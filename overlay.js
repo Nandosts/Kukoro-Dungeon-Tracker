@@ -40,7 +40,7 @@ function injectKukoroOverlay() {
       </div>
     </div>
     <div id="kukoro-body" style="padding: 10px; overflow-y: auto; flex: 1;">
-      <div id="ov-disabled-overlay" style="display: none; text-align: center; padding: 20px; background: #1a1a1e; border-radius: 8px; margin-bottom: 10px; border: 1px solid #ff5252;">
+      <div id="ov-disabled-overlay" style="display: none; text-align: center; padding: 20px; background: #1a1e1e; border-radius: 8px; margin-bottom: 10px; border: 1px solid #ff5252;">
         <div style="font-size: 1.5em; margin-bottom: 10px;">⚠️</div>
         <div id="ov-disabled-text" style="font-weight: bold; color: #ff5252;">${t('overlayDisabled')}</div>
       </div>
@@ -94,13 +94,10 @@ function injectKukoroOverlay() {
   });
 
   quickClearBtn.addEventListener('click', () => {
-    // Limpeza rápida sem confirmação para agilizar
     const channel = window.location.pathname.split('/')[1]?.toLowerCase();
     if (channel) {
       chrome.storage.local.get(['kukoro_data'], f => {
-        let d = f.kukoro_data || {};
-        delete d[channel];
-        chrome.storage.local.set({ kukoro_data: d });
+        let d = f.kukoro_data || {}; delete d[channel]; chrome.storage.local.set({ kukoro_data: d });
       });
     }
   });
@@ -122,13 +119,13 @@ function initOverlayLogic() {
       <button class="ov-tab-btn" data-tab="nicks" style="flex: 1; padding: 5px; background: none; border: none; color: #adadb8; cursor: pointer; font-size: 0.8em;">${t('tabJogadores')}</button>
     </div>
     <div id="ov-tab-players">
-      <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.75em; background: #26262c; padding: 5px; border-radius: 4px;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.75em; background: #1e1e1e; padding: 5px; border-radius: 4px; border: 1px solid #333;">
         <div>${t('labelTotal')}: <span id="ov-total-count">0</span>/16</div>
         <div id="ov-filtered-container" style="display: none;">${t('labelFiltrados')}: <span id="ov-filtered-count">0</span></div>
       </div>
       <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-        <input type="text" id="ov-search-input" placeholder="${t('placeholderSearch')}" style="flex: 1; padding: 5px; border-radius: 4px; border: 1px solid #333; background: #26262c; color: white; font-size: 0.8em; min-width: 0;">
-        <select id="ov-sort-select" style="padding: 5px; background: #26262c; color: white; border: 1px solid #333; border-radius: 4px; font-size: 0.75em; outline: none; cursor: pointer; max-width: 90px;">
+        <input type="text" id="ov-search-input" placeholder="${t('placeholderSearch')}" style="flex: 1; padding: 5px; border-radius: 4px; border: 1px solid #333; background: #1e1e1e; color: white; font-size: 0.8em; min-width: 0; outline: none;">
+        <select id="ov-sort-select" style="padding: 5px; background: #1e1e1e; color: #d4af37; border: 1px solid #333; border-radius: 4px; font-size: 0.75em; outline: none; cursor: pointer; max-width: 90px; font-weight: bold;">
           <option value="recent">${t('labelRecentes')}</option>
           <option value="lv_desc">${t('labelMaiorNivel')}</option>
           <option value="lv_asc">${t('labelMenorNivel')}</option>
@@ -143,12 +140,12 @@ function initOverlayLogic() {
       </div>
       <div id="ov-enemy-filters" style="display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap;"></div>
       <div id="ov-player-list"></div>
-      <div id="ov-no-data" style="text-align: center; color: #adadb8; font-size: 0.8em; margin: 10px 0;">${t('msgNoData')}</div>
-      <button id="ov-clear-btn" style="width: 100%; padding: 5px; background: #eb0400; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75em; font-weight: bold; margin-top: 10px;">${t('btnLimparCanal')}</button>
+      <div id="ov-no-data" style="text-align: center; color: #757575; font-size: 0.8em; margin: 15px 0;">${t('msgNoData')}</div>
+      <button id="ov-clear-btn" style="width: 100%; padding: 6px; background: #8b0000; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75em; font-weight: bold; margin-top: 10px;">${t('btnLimparCanal')}</button>
     </div>
     <div id="ov-tab-nicks" style="display: none;">
-      <div id="ov-nick-list" style="background: #1f1f23; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 0.8em; line-height: 1.4; max-height: 200px; overflow-y: auto;"></div>
-      <button id="ov-copy-nicks" style="width: 100%; margin-top: 10px; padding: 5px; background: #9147ff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em;">${t('btnCopiarTodos')}</button>
+      <div id="ov-nick-list" style="background: #1e1e1e; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 0.8em; line-height: 1.4; max-height: 200px; overflow-y: auto; border: 1px solid #333; color: #f0e6d2;"></div>
+      <button id="ov-copy-nicks" style="width: 100%; margin-top: 10px; padding: 6px; background: #d4af37; color: #121212; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; font-weight: bold;">${t('btnCopiarTodos')}</button>
     </div>
   `;
 
@@ -200,10 +197,8 @@ function initOverlayLogic() {
       const players = (res.kukoro_data || {})[channel] || {};
       const allIds = Object.keys(players);
 
-      if (!ovE) { 
-        overlayEl.style.display = 'none'; 
-        return; 
-      }
+      // MOSTRAR SEMPRE SE HABILITADO (mesmo sem dados)
+      if (!ovE) { overlayEl.style.display = 'none'; return; }
       else overlayEl.style.display = 'flex';
 
       document.getElementById('ov-power-toggle').textContent = extE ? '🟢' : '🔴';
@@ -242,7 +237,8 @@ function initOverlayLogic() {
           const info = ENEMY_MAPPING[curEnemyFilter]; const sub = info?.sub;
           const temExata = v.classes.includes(curEnemyFilter);
           const sL = (p.skills || "").toLowerCase();
-          const temGen = sub && (sL.includes(sub.toLowerCase()) || (sub === "Humanóide" && (sL.includes("humanoide") || sL.includes("humanóide"))));
+          const subName = sub ? t(`sub${sub}`).toLowerCase() : "";
+          const temGen = sub && (sL.includes(subName) || (sub === "Humanoid" && (sL.includes("humanoide") || sL.includes("humanóide"))));
           mE = temExata || temGen;
         }
         return mS && mSt && mE;
@@ -263,10 +259,13 @@ function initOverlayLogic() {
       const nList = document.getElementById('ov-nick-list'); nList.innerHTML = '';
       allIds.sort().forEach(id => {
         const p = players[id]; const div = document.createElement('div');
-        div.style.cssText = 'display:flex; justify-content:space-between; padding:1px 0; border-bottom:1px solid #222;';
+        div.style.cssText = 'display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px solid #222;';
         const v = idVantagens(p.skills || "");
-        const labels = [...v.classes, ...v.subs].filter(l => !v.classes.some(c => t(`label${ENEMY_MAPPING[c].sub}`) === l));
-        div.innerHTML = `<span style="${p.isDead ? 'color:#666' : ''}">${p.isPending ? '⚠️ ' : ''}${p.name}</span><span style="font-size:0.8em; color:#00ffcc">${labels.join(', ')}</span>`;
+        const labels = [...v.classes.map(c => t(`class${c}`)), ...v.subs.map(s => t(`sub${s}`))].filter(l => {
+          const subId = ["Humanoid", "Beast", "Cursed"].find(sid => t(`sub${sid}`) === l);
+          return subId ? !v.classes.some(cid => ENEMY_MAPPING[cid].sub === subId) : true;
+        });
+        div.innerHTML = `<span style="${p.isDead ? 'color:#757575' : 'color:#e0e0e0'}">${p.isPending ? '⚠️ ' : ''}${p.name}</span><span style="font-size:0.7em; color:#4db8ff">${labels.join(', ')}</span>`;
         nList.appendChild(div);
       });
 
@@ -277,19 +276,20 @@ function initOverlayLogic() {
       filteredIds.forEach(id => {
         const p = players[id]; const v = idVantagens(p.skills || "");
         const card = document.createElement('div');
-        card.style.cssText = `border: 1px ${p.isPending ? 'dashed' : 'solid'} #9147ff; border-radius: 4px; padding: 8px; margin-bottom: 8px; background: ${p.isDead ? '#1a1a1e' : '#1f1f23'}; opacity: ${p.isDead ? '0.6' : '1'};`;
+        card.style.cssText = `border: 1px ${p.isPending ? 'dashed' : 'solid'} #d4af37; border-radius: 4px; padding: 8px; margin-bottom: 8px; background: ${p.isDead ? '#161616' : '#1e1e1e'}; opacity: ${p.isDead ? '0.6' : '1'};`;
         
+        const labels = [...new Set([...v.classes.map(c => ({id: c, type:'class'})), ...v.subs.map(s => ({id: s, type:'sub'}))])].filter(item => {
+          if (item.type === 'sub') return !v.classes.some(cid => ENEMY_MAPPING[cid].sub === item.id);
+          return true;
+        });
+
         if (p.isPending) {
-          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-weight:bold; color:#ffcc00">@${p.name} [${t('statusAguardando')}]</div><div style="font-size:0.65em; color:#adadb8; background:#333; padding:2px 5px; border-radius:4px;">${t('statusPendente')}</div></div><div style="font-size:0.7em; color:#adadb8; margin-top:5px;">${t('msgPendingInfo')}</div><div style="display:flex; justify-content:flex-end; margin-top:5px;"><button class="ov-st-btn" style="padding:2px 6px; font-size:0.7em; background:#444; color:white; border:none; border-radius:3px; cursor:pointer;">${t('btnMorto')}</button></div>`;
+          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-weight:bold; color:#f0e6d2">@${p.name} [${t('statusAguardando')}]</div><div style="font-size:0.65em; color:#9e9e9e; background:#333; padding:2px 5px; border-radius:4px;">${t('statusPendente')}</div></div><div style="font-size:0.7em; color:#9e9e9e; margin-top:5px;">${t('msgPendingInfo')}</div><div style="display:flex; justify-content:flex-end; margin-top:5px;"><button class="ov-st-btn" style="padding:2px 6px; font-size:0.7em; background:#333; color:white; border:none; border-radius:3px; cursor:pointer;">${t('btnMorto')}</button></div>`;
         } else {
-          const labels = [...new Set([...v.classes, ...v.subs])].filter(l => {
-            const subRaw = ["Humanóide", "Besta", "Maldito"].find(s => t(`label${s}`) === l);
-            return subRaw ? !v.classes.some(c => ENEMY_MAPPING[c].sub === subRaw) : true;
-          });
-          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-weight:bold; color:#bf94ff; font-size:0.9em;">@${p.name} <span style="font-size:0.8em; color:#adadb8;">[Lv.${p.lv}]</span></div><div style="display:flex; gap:3px; flex-wrap:wrap; justify-content:flex-end; max-width:50%;">${labels.map(l => {
-            let c = '#00ffcc'; if (l === t('labelHumanoide')) c = '#ffcc00'; if (l === t('labelMaldito')) c = '#ff4b4b';
-            return `<div style="font-size:0.55em; color:${c}; border:1px solid currentColor; padding:1px 4px; border-radius:8px; font-weight:bold; text-transform:uppercase; white-space:nowrap;">${l}</div>`;
-          }).join('')}</div></div><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:3px; font-size:0.75em; margin:5px 0; color:#adadb8;"><div>DEF: <span style="color:white">${p.def}</span></div><div>AGI: <span style="color:white">${p.agi}</span></div><div>CRIT: <span style="color:white">${p.crit}</span></div></div><div style="font-size:0.75em; font-style:italic; color:#00ffcc; border-top:1px solid #333; padding-top:4px;">${p.skills}</div><div style="display:flex; justify-content:flex-end; margin-top:5px;"><button class="ov-st-btn" style="padding:2px 6px; font-size:0.7em; background:${p.isDead?'#444':'#9147ff'}; color:white; border:none; border-radius:3px; cursor:pointer;">${p.isDead?t('btnReviver'):t('btnMorto')}</button></div>`;
+          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-weight:bold; color:#f0e6d2; font-size:0.9em;">@${p.name} <span style="font-size:0.8em; color:#9e9e9e;">[Lv.${p.lv}]</span></div><div style="display:flex; gap:3px; flex-wrap:wrap; justify-content:flex-end; max-width:50%;">${labels.map(item => {
+            let c = '#4db8ff'; if (item.id === 'Humanoid') c = '#d4af37'; if (item.id === 'Cursed') c = '#ff5252';
+            return `<div style="font-size:0.55em; color:${c}; border:1px solid currentColor; padding:1px 4px; border-radius:8px; font-weight:bold; text-transform:uppercase; white-space:nowrap;">${t(item.type === 'class' ? `class${item.id}` : `sub${item.id}`)}</div>`;
+          }).join('')}</div></div><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:3px; font-size:0.75em; margin:5px 0; color:#9e9e9e;"><div>DEF: <span style="color:white">${p.def}</span></div><div>AGI: <span style="color:white">${p.agi}</span></div><div>CRIT: <span style="color:white">${p.crit}</span></div></div><div style="font-size:0.75em; font-style:italic; color:#4db8ff; border-top:1px solid #333; padding-top:4px;">${p.skills}</div><div style="display:flex; justify-content:flex-end; margin-top:5px;"><button class="ov-st-btn" style="padding:2px 6px; font-size:0.7em; background:${p.isDead?'#333':'#d4af37'}; color:${p.isDead?'white':'#121212'}; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">${p.isDead?t('btnReviver'):t('btnMorto')}</button></div>`;
         }
         card.querySelector('.ov-st-btn').onclick = () => {
           chrome.storage.local.get(['kukoro_data'], f => {
@@ -306,14 +306,14 @@ function initOverlayLogic() {
     const current = Array.from(container.querySelectorAll('.ov-sub-btn:not([data-sub="all"])')).map(b => b.dataset.sub);
     if (JSON.stringify(current) === JSON.stringify(enemies)) return;
     container.innerHTML = '';
-    const addBtn = (label, sub) => {
+    const addBtn = (id, sub) => {
       const btn = document.createElement('button'); btn.className = `ov-sub-btn ${curEnemyFilter === sub ? 'active' : ''}`;
-      btn.dataset.sub = sub; btn.textContent = label;
-      btn.style.cssText = `padding:2px 6px; font-size:0.65em; cursor:pointer; background:${curEnemyFilter===sub?'#9147ff':'#1a1a1e'}; color:white; border:1px solid #444; border-radius:3px;`;
+      btn.dataset.sub = sub; btn.textContent = sub === 'all' ? t('labelTodos') : t(`class${id}`);
+      btn.style.cssText = `padding:2px 6px; font-size:0.65em; cursor:pointer; background:${curEnemyFilter===sub?'#d4af37':'#1a1a1e'}; color:${curEnemyFilter===sub?'#121212':'#adadb8'}; border:1px solid #444; border-radius:3px; font-weight:bold;`;
       btn.onclick = () => { curEnemyFilter = (curEnemyFilter === sub && sub !== 'all') ? 'all' : sub; update(); };
       container.appendChild(btn);
     };
-    addBtn(t('labelTodos'), 'all');
+    addBtn(null, 'all');
     enemies.forEach(e => addBtn(e, e));
   }
 
@@ -324,11 +324,11 @@ function initOverlayLogic() {
     curFilter = 'all'; curEnemyFilter = 'all'; update();
   };
   document.querySelectorAll('.ov-filter-btn').forEach(b => b.onclick = () => {
-    document.querySelectorAll('.ov-filter-btn').forEach(x => x.classList.remove('active'));
-    b.classList.add('active'); curFilter = b.dataset.filter; update();
+    document.querySelectorAll('.ov-filter-btn').forEach(x => { x.classList.remove('active'); x.style.background='#333'; x.style.color='white'; });
+    b.classList.add('active'); b.style.background='#d4af37'; b.style.color='#121212'; curFilter = b.dataset.filter; update();
   });
   document.querySelectorAll('.ov-tab-btn').forEach(b => b.onclick = () => {
-    document.querySelectorAll('.ov-tab-btn').forEach(x => { x.classList.toggle('active', x===b); x.style.color = x===b?'white':'#adadb8'; });
+    document.querySelectorAll('.ov-tab-btn').forEach(x => { x.classList.toggle('active', x===b); x.style.color = x===b?'#d4af37':'#adadb8'; });
     document.getElementById('ov-tab-players').style.display = b.dataset.tab==='players'?'block':'none';
     document.getElementById('ov-tab-nicks').style.display = b.dataset.tab==='nicks'?'block':'none';
   });

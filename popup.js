@@ -50,26 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#disabled-overlay div:nth-child(2)').textContent = t('overlayDisabled');
     document.querySelector('#disabled-overlay div:nth-child(3)').textContent = t('overlayEnableMsg');
     
-    // Tooltips
     resetFiltersBtn.title = t('tooltipReset');
-    powerSwitch.parentElement.title = t('tooltipPower');
-    overlaySwitch.parentElement.title = t('showOverlayLabel');
-    document.getElementById('btn-copy-pix').title = t('copied').replace('!', ''); // Reuso sutil
+    document.getElementById('power-switch-container').title = t('tooltipPower');
+    document.getElementById('overlay-switch-container').title = t('showOverlayLabel');
+    document.getElementById('btn-copy-pix').title = t('copied').replace('!', '');
   }
 
-  // Evento para copiar a chave Pix
-  document.getElementById('btn-copy-pix').addEventListener('click', () => {
-    const chavePix = '3e4c4338-be76-47d2-831f-04e41aaa9466';
-    navigator.clipboard.writeText(chavePix).then(() => {
-      const btn = document.getElementById('text-pix-btn');
-      const oldText = btn.textContent;
-      btn.textContent = t('copied');
-      setTimeout(() => btn.textContent = oldText, 2000);
-    });
-  });
-
-  // MAPEAMENTO DE INIMIGOS E SUBCLASSES (INTERNACIONALIZADO)
-  // Usamos chaves de tradução como identificadores internos para os botões
   const ENEMY_MAPPING = {
     "Bat": { sub: "Beast", keywords: ["Morcego", "Bat", "Murciélago", "Murcielago"] },
     "Cyclops": { sub: "Humanoid", keywords: ["Ciclope", "Cyclops"] },
@@ -98,25 +84,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const skillsLower = skills.toLowerCase();
     let classes = [];
     let subs = new Set();
-    
     for (const [id, info] of Object.entries(ENEMY_MAPPING)) {
       const match = info.keywords.some(k => {
-        // Usa Unicode property escapes (\p{L}) para suportar bordas de palavras com acentos (ex: Dragão, Araña)
         const regex = new RegExp(`(^|[^\\p{L}])${k.toLowerCase()}([^\\p{L}]|$)`, 'iu');
         return regex.test(skillsLower);
       });
-      
       if (match) {
         classes.push(id);
         if (info.sub !== "Unknown") subs.add(info.sub);
       }
     }
-
-    // Vantagens genéricas (suporta PT, EN e ES)
     if (/(^|[^\p{L}])(humanóide|humanoide|humanoid)(-[^\p{L}]|$)/iu.test(skillsLower)) subs.add("Humanoid");
     if (/(^|[^\p{L}])(besta|beast|bestia)(-[^\p{L}]|$)/iu.test(skillsLower)) subs.add("Beast");
     if (/(^|[^\p{L}])(maldito|cursed)(-[^\p{L}]|$)/iu.test(skillsLower)) subs.add("Cursed");
-
     return { classes, subs: Array.from(subs) };
   }
 
@@ -137,13 +117,26 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.set({ overlay_enabled: overlaySwitch.checked });
   });
 
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local') {
+      if (changes.extension_enabled) {
+        powerSwitch.checked = changes.extension_enabled.newValue !== false;
+        updateUIState(powerSwitch.checked);
+      }
+      if (changes.overlay_enabled) {
+        overlaySwitch.checked = changes.overlay_enabled.newValue === true;
+      }
+      updateList();
+    }
+  });
+
   function updateUIState(enabled) {
+    const mainArea = document.getElementById('main-content-area');
     if (enabled) {
-      tabPlayers.style.display = 'block';
+      mainArea.style.display = 'block';
       disabledOverlay.style.display = 'none';
     } else {
-      tabPlayers.style.display = 'none';
-      tabNicks.style.display = 'none';
+      mainArea.style.display = 'none';
       disabledOverlay.style.display = 'block';
     }
   }
@@ -222,44 +215,34 @@ document.addEventListener('DOMContentLoaded', () => {
           const sub = info?.sub;
           const temClasseExata = v.classes.includes(currentEnemyFilter);
           const sL = (p.skills || "").toLowerCase();
-          
-          // Lógica de herança de subclasse corrigida para novos IDs
-          const subKey = sub ? `sub${sub}` : null;
-          const subName = subKey ? t(subKey).toLowerCase() : "";
-          const temVantagemGenericaSub = sub && (sL.includes(subName) || (sub === "Humanoid" && sL.includes("humanoide")));
-          
+          const subName = sub ? t(`sub${sub}`).toLowerCase() : "";
+          const temVantagemGenericaSub = sub && (sL.includes(subName) || (sub === "Humanoid" && (sL.includes("humanoide") || sL.includes("humanóide"))));
           mE = temClasseExata || temVantagemGenericaSub;
         }
         return mS && mSt && mE;
       });
 
       const hasF = searchTerm !== '' || currentFilter !== 'all' || currentEnemyFilter !== 'all';
-      filteredContainer.style.display = hasF ? 'block' : 'none';
+      filteredContainer.style.display = hasF ? 'inline' : 'none';
       filteredCountEl.textContent = filteredIds.length;
 
       nickList.innerHTML = '';
       allIds.sort().forEach(id => {
         const p = players[id]; const item = document.createElement('div');
-        item.style.cssText = 'display:flex; justify-content:space-between; padding:2px 0;';
+        item.style.cssText = 'display:flex; justify-content:space-between; padding:3px 0; border-bottom: 1px solid #222;';
         const nameSpan = document.createElement('span'); nameSpan.textContent = p.name;
-        if (p.isDead) nameSpan.style.color = '#666';
+        if (p.isDead) nameSpan.style.color = '#757575';
         item.appendChild(nameSpan);
         if (p.isPending) {
           const w = document.createElement('span'); w.textContent = '⚠️'; w.title = t('statusAguardando'); item.appendChild(w);
         } else {
           const v = identificarVantagens(p.skills || "");
-          const labels = [...v.classes.map(c => t(`class${c}`)), ...v.subs.map(s => t(`sub${s}`))];
-          // Otimização de labels na lista de nicks
-          const finalLabels = labels.filter(l => {
-             const foundClassId = Object.keys(ENEMY_MAPPING).find(cid => t(`class${cid}`) === l);
-             if (foundClassId) return true;
-             // Se for label de sub, checa se alguma classe dela já está presente por tradução
-             const subId = ["Humanoid", "Beast", "Cursed"].find(sid => t(`sub${sid}`) === l);
-             if (subId) return !v.classes.some(cid => ENEMY_MAPPING[cid].sub === subId);
-             return true;
+          const labels = [...v.classes.map(c => t(`class${c}`)), ...v.subs.map(s => t(`sub${s}`))].filter(l => {
+            const subId = ["Humanoid", "Beast", "Cursed"].find(sid => t(`sub${sid}`) === l);
+            return subId ? !v.classes.some(cid => ENEMY_MAPPING[cid].sub === subId) : true;
           });
-          if (finalLabels.length > 0) {
-            const vs = document.createElement('span'); vs.style.cssText = 'font-size:0.7em; color:#00ffcc;'; vs.textContent = finalLabels.join(', '); item.appendChild(vs);
+          if (labels.length > 0) {
+            const vs = document.createElement('span'); vs.style.cssText = 'font-size:0.75em; color:#4db8ff;'; vs.textContent = labels.join(', '); item.appendChild(vs);
           }
         }
         nickList.appendChild(item);
@@ -283,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div'); card.className = `player-card ${p.isDead ? 'dead' : ''}`;
         if (p.isPending) {
           card.style.borderStyle = 'dashed';
-          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div class="player-name">@${p.name} <span style="font-size:0.8em; color:#ffcc00;">[${t('statusAguardando')}]</span></div><div style="font-size:0.65em; color:#adadb8; background:#333; padding:2px 5px; border-radius:4px;">${t('statusPendente')}</div></div><div style="margin-top:10px; font-size:0.85em; color:#adadb8; font-style:italic;">${t('msgPendingInfo')}</div><div style="margin-top:8px; display:flex; justify-content:flex-end;"><button class="status-btn" style="padding:4px 8px; font-size:0.75em; cursor:pointer; background:#444; color:white; border:none; border-radius:4px;">${t('btnMorto')}</button></div>`;
+          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div class="player-name">@${p.name} <span style="font-size:0.8em; color:#f0ad4e;">[${t('statusAguardando')}]</span></div><div style="font-size:0.65em; color:#9e9e9e; background:#333; padding:2px 5px; border-radius:4px;">${t('statusPendente')}</div></div><div style="margin-top:10px; font-size:0.75em; color:#9e9e9e; font-style:italic;">${t('msgPendingInfo')}</div><div style="display:flex; justify-content:flex-end; margin-top:8px;"><button class="status-btn" style="padding:4px 8px; font-size:0.75em; cursor:pointer; background:#333; color:white; border:none; border-radius:4px; font-weight:bold;">${t('btnMorto')}</button></div>`;
         } else {
           const labels = [...new Set([...v.classes.map(c => ({id: c, type:'class'})), ...v.subs.map(s => ({id: s, type:'sub'}))])].filter(item => {
             if (item.type === 'sub') return !v.classes.some(cid => ENEMY_MAPPING[cid].sub === item.id);
@@ -307,11 +290,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtn = (id, sub) => {
       const btn = document.createElement('button'); btn.className = `sub-filter-btn ${currentEnemyFilter === sub ? 'active' : ''}`;
       btn.dataset.sub = sub; btn.textContent = sub === 'all' ? t('labelTodos') : t(`class${id}`);
-      btn.style.cssText = 'padding:3px 8px; font-size:0.7em; cursor:pointer; background:#1a1a1e; color:#adadb8; border:1px solid #444; border-radius:4px;';
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.sub-filter-btn').forEach(b => b.classList.remove('active'));
-        if (currentEnemyFilter === sub && sub !== 'all') { currentEnemyFilter = 'all'; document.querySelector('.sub-filter-btn[data-sub="all"]').classList.add('active'); }
-        else { btn.classList.add('active'); currentEnemyFilter = sub; }
+        if (currentEnemyFilter === sub && sub !== 'all') currentEnemyFilter = 'all';
+        else currentEnemyFilter = sub;
         updateList();
       });
       enemyFiltersContainer.appendChild(btn);
@@ -323,14 +304,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function togglePlayerStatus(id) {
     chrome.storage.local.get(['kukoro_data'], res => {
       let d = res.kukoro_data || {}; if (d[currentChannel] && d[currentChannel][id]) {
-        d[currentChannel][id].isDead = !d[currentChannel][id].isDead; chrome.storage.local.set({ kukoro_data: d }, updateList);
+        d[currentChannel][id].isDead = !d[currentChannel][id].isDead; chrome.storage.local.set({ kukoro_data: d });
       }
     });
   }
 
   function clearChannelData() {
     chrome.storage.local.get(['kukoro_data'], res => {
-      let d = res.kukoro_data || {}; delete d[currentChannel]; chrome.storage.local.set({ kukoro_data: d }, updateList);
+      let d = res.kukoro_data || {}; delete d[currentChannel]; chrome.storage.local.set({ kukoro_data: d });
     });
   }
 
@@ -338,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
   sortSelect.addEventListener('change', updateList);
   resetFiltersBtn.addEventListener('click', () => {
     searchInput.value = ''; currentFilter = 'all'; currentEnemyFilter = 'all';
-    filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'all')); updateList();
+    updateList();
   });
 
   filterBtns.forEach(btn => btn.addEventListener('click', () => {
@@ -346,27 +327,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }));
 
   tabBtns.forEach(btn => btn.addEventListener('click', () => {
-    tabBtns.forEach(b => { b.classList.toggle('active', b === btn); b.style.color = (b === btn) ? 'white' : '#adadb8'; });
+    tabBtns.forEach(b => b.classList.toggle('active', b === btn));
     const tab = btn.dataset.tab; tabPlayers.style.display = (tab === 'players') ? 'block' : 'none'; tabNicks.style.display = (tab === 'nicks') ? 'block' : 'none'; updateList();
   }));
 
   copyNicksBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(nickList.innerText).then(() => {
+    const textToCopy = Array.from(nickList.children).map(div => div.firstChild.textContent).join('\n');
+    navigator.clipboard.writeText(textToCopy).then(() => {
       const old = copyNicksBtn.textContent; copyNicksBtn.textContent = t('copied'); setTimeout(() => copyNicksBtn.textContent = old, 2000);
     });
   });
 
-  // Mantém os toggles sincronizados se mudarem via Overlay ou outras abas
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local') {
-      if (changes.extension_enabled) {
-        powerSwitch.checked = changes.extension_enabled.newValue !== false;
-        updateUIState(powerSwitch.checked);
-      }
-      if (changes.overlay_enabled) {
-        overlaySwitch.checked = changes.overlay_enabled.newValue === true;
-      }
-    }
+  document.getElementById('btn-copy-pix').addEventListener('click', () => {
+    navigator.clipboard.writeText('3e4c4338-be76-47d2-831f-04e41aaa9466').then(() => {
+      const btnText = document.getElementById('text-pix-btn');
+      const old = btnText.textContent; btnText.textContent = t('copied'); setTimeout(() => btnText.textContent = old, 2000);
+    });
   });
 
   document.getElementById('clear-btn').addEventListener('click', () => {
