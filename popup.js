@@ -24,27 +24,67 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentEnemyFilter = 'all'; 
   let autoClearTimeout = null;
 
-  // MAPEAMENTO DE INIMIGOS E SUBCLASSES
+  function t(key, substitutions) {
+    return chrome.i18n.getMessage(key, substitutions);
+  }
+
+  function applyTranslations() {
+    document.getElementById('tab-habilidades').textContent = t('tabHabilidades');
+    document.getElementById('tab-jogadores').textContent = t('tabJogadores');
+    document.getElementById('text-total').textContent = t('labelTotal');
+    document.getElementById('text-filtrados').textContent = t('labelFiltrados');
+    document.getElementById('search-input').placeholder = t('placeholderSearch');
+    document.getElementById('opt-recent').textContent = t('labelRecentes');
+    document.getElementById('opt-lv-desc').textContent = t('labelMaiorNivel');
+    document.getElementById('opt-lv-asc').textContent = t('labelMenorNivel');
+    document.getElementById('opt-name-asc').textContent = t('labelAZ');
+    document.getElementById('filter-all').textContent = t('labelTodos');
+    document.getElementById('filter-alive').textContent = t('labelVivos');
+    document.getElementById('filter-dead').textContent = t('labelMortos');
+    document.getElementById('text-vantagem').textContent = t('labelVantagem');
+    document.getElementById('clear-btn').textContent = t('btnLimparCanal');
+    document.getElementById('text-show-overlay').textContent = t('showOverlayLabel');
+    document.getElementById('copy-nicks').textContent = t('btnCopiarTodos');
+    document.getElementById('text-support-dev').textContent = t('textSupportDev');
+    document.getElementById('text-tip-btn').textContent = t('btnTip');
+    document.querySelector('#disabled-overlay div:nth-child(2)').textContent = t('overlayDisabled');
+    document.querySelector('#disabled-overlay div:nth-child(3)').textContent = t('overlayEnableMsg');
+  }
+
+  // Evento para copiar a chave Pix
+  document.getElementById('btn-copy-pix').addEventListener('click', () => {
+    const chavePix = '3e4c4338-be76-47d2-831f-04e41aaa9466';
+    navigator.clipboard.writeText(chavePix).then(() => {
+      const btn = document.getElementById('text-pix-btn');
+      const oldText = btn.textContent;
+      btn.textContent = t('copied');
+      setTimeout(() => btn.textContent = oldText, 2000);
+    });
+  });
+
+  // MAPEAMENTO DE INIMIGOS E SUBCLASSES (INTERNACIONALIZADO)
+  // Usamos chaves de tradução como identificadores internos para os botões
   const ENEMY_MAPPING = {
-    "Aranha": { sub: "Besta", keywords: ["Aranha", "Viúva Roxa"] },
-    "Ciclope": { sub: "Humanóide", keywords: ["Ciclope"] },
-    "Diabrete": { sub: "Maldito", keywords: ["Diabrete", "Diabretezinho", "Diabrete Alado"] },
-    "Dragão": { sub: "Besta", keywords: ["Dragão", "Wyvern"] },
-    "Esqueleto": { sub: "Maldito", keywords: ["Esqueleto", "Lanceiro Esqueleto", "Guerreiro Esqueleto"] },
-    "Gárgula": { sub: "Maldito", keywords: ["Gárgula"] },
-    "Goblin": { sub: "Humanóide", keywords: ["Goblin", "Batedor Goblin", "Lanceiro Goblin", "Goblin Montado"] },
-    "Gosma": { sub: "Besta", keywords: ["Gosma", "Muco"] },
-    "Lagarto": { sub: "Besta", keywords: ["Lagarto", "Lanceiro Lagarto", "Guarda Lagarto"] },
-    "Lobo": { sub: "Besta", keywords: ["Lobo", "Lobisomem"] },
-    "Minotauro": { sub: "Besta", keywords: ["Minotauro", "Cavaleiro Minotauro", "Fera Minotauro"] },
-    "Morcego": { sub: "Besta", keywords: ["Morcego"] },
-    "Naga": { sub: "Humanóide", keywords: ["Naga"] },
-    "Oni": { sub: "Maldito", keywords: ["Oni"] },
-    "Orc": { sub: "Humanóide", keywords: ["Orc", "Feiticeiro Orc", "Orc Montado"] },
-    "Sombra": { sub: "Maldito", keywords: ["Sombra", "Espírito das Sombras", "Sombra Macabra"] },
-    "Troll": { sub: "Humanóide", keywords: ["Troll"] },
-    "Zumbi": { sub: "Maldito", keywords: ["Zumbi", "Sem Cérebro"] },
-    "Momba": { sub: "Desconhecido", keywords: ["Momba"] }
+    "Bat": { sub: "Beast", keywords: ["Morcego", "Bat", "Murciélago", "Murcielago"] },
+    "Cyclops": { sub: "Humanoid", keywords: ["Ciclope", "Cyclops"] },
+    "Dragon": { sub: "Beast", keywords: ["Dragão", "Dragon", "Dragón", "Wyvern"] },
+    "Gargoyle": { sub: "Cursed", keywords: ["Gárgula", "Gargoyle", "Gárgola", "Gargola"] },
+    "Goblin": { sub: "Humanoid", keywords: ["Goblin", "Batedor Goblin", "Lanceiro Goblin", "Goblin Montado"] },
+    "Human": { sub: "Humanoid", keywords: ["Humano", "Human", "Jogador", "Player"] },
+    "Imp": { sub: "Cursed", keywords: ["Diabrete", "Imp", "Diablillo", "Diabretezinho", "Diabrete Alado"] },
+    "Lizard": { sub: "Beast", keywords: ["Lagarto", "Lizard", "Lizardo", "Lanceiro Lagarto", "Guarda Lagarto"] },
+    "Minotaur": { sub: "Beast", keywords: ["Minotauro", "Minotaur", "Cavaleiro Minotauro", "Fera Minotauro"] },
+    "Naga": { sub: "Humanoid", keywords: ["Naga"] },
+    "Oni": { sub: "Cursed", keywords: ["Oni", "Oni Vermelho"] },
+    "Orc": { sub: "Humanoid", keywords: ["Orc", "Feiticeiro Orc", "Orc Montado", "Orco"] },
+    "Shadow": { sub: "Cursed", keywords: ["Sombra", "Shadow", "Espírito das Sombras", "Sombra Macabra"] },
+    "Skeleton": { sub: "Cursed", keywords: ["Esqueleto", "Skeleton", "Lanceiro Esqueleto", "Guerreiro Esqueleto"] },
+    "Slime": { sub: "Beast", keywords: ["Gosma", "Slime", "Limo", "Muco", "Gosma Verde"] },
+    "Spider": { sub: "Beast", keywords: ["Aranha", "Spider", "Araña", "Arana", "Viúva Roxa"] },
+    "Troll": { sub: "Humanoid", keywords: ["Troll"] },
+    "Wolf": { sub: "Beast", keywords: ["Lobo", "Wolf", "Lobisomem", "Lobo Selvagem"] },
+    "Zombie": { sub: "Cursed", keywords: ["Zumbi", "Zombie", "Zombi", "Sem Cérebro"] },
+    "Momba": { sub: "Unknown", keywords: ["Momba"] }
   };
 
   function identificarVantagens(skills) {
@@ -53,32 +93,30 @@ document.addEventListener('DOMContentLoaded', () => {
     let classes = [];
     let subs = new Set();
     
-    // Identifica classes específicas usando REGEX para palavra inteira (\b)
-    // Isso evita que "morcego" contenha "orc" ou "porco" contenha "orc"
-    for (const [classe, info] of Object.entries(ENEMY_MAPPING)) {
+    for (const [id, info] of Object.entries(ENEMY_MAPPING)) {
       const match = info.keywords.some(k => {
-        const regex = new RegExp(`\\b${k.toLowerCase()}\\b`, 'i');
+        // Usa Unicode property escapes (\p{L}) para suportar bordas de palavras com acentos (ex: Dragão, Araña)
+        const regex = new RegExp(`(^|[^\\p{L}])${k.toLowerCase()}([^\\p{L}]|$)`, 'iu');
         return regex.test(skillsLower);
       });
       
       if (match) {
-        classes.push(classe);
-        if (info.sub !== "Desconhecido") subs.add(info.sub);
+        classes.push(id);
+        if (info.sub !== "Unknown") subs.add(info.sub);
       }
     }
 
-    // Identifica se tem vantagem genérica contra a subclasse inteira
-    if (/\bhumanóide\b/i.test(skillsLower) || /\bhumanoide\b/i.test(skillsLower)) subs.add("Humanóide");
-    if (/\bbesta\b/i.test(skillsLower)) subs.add("Besta");
-    if (/\bmaldito\b/i.test(skillsLower)) subs.add("Maldito");
+    // Vantagens genéricas (suporta PT, EN e ES)
+    if (/(^|[^\p{L}])(humanóide|humanoide|humanoid)(-[^\p{L}]|$)/iu.test(skillsLower)) subs.add("Humanoid");
+    if (/(^|[^\p{L}])(besta|beast|bestia)(-[^\p{L}]|$)/iu.test(skillsLower)) subs.add("Beast");
+    if (/(^|[^\p{L}])(maldito|cursed)(-[^\p{L}]|$)/iu.test(skillsLower)) subs.add("Cursed");
 
     return { classes, subs: Array.from(subs) };
   }
 
-  // Carrega o estado da extensão e overlay
   chrome.storage.local.get(['extension_enabled', 'overlay_enabled'], (result) => {
-    const enabled = result.extension_enabled !== false; // Padrão true
-    const overlayEnabled = result.overlay_enabled === true; // Padrão false
+    const enabled = result.extension_enabled !== false;
+    const overlayEnabled = result.overlay_enabled === true;
     powerSwitch.checked = enabled;
     overlaySwitch.checked = overlayEnabled;
     updateUIState(enabled);
@@ -86,9 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   powerSwitch.addEventListener('change', () => {
     const enabled = powerSwitch.checked;
-    chrome.storage.local.set({ extension_enabled: enabled }, () => {
-      updateUIState(enabled);
-    });
+    chrome.storage.local.set({ extension_enabled: enabled }, () => updateUIState(enabled));
   });
 
   overlaySwitch.addEventListener('change', () => {
@@ -106,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Descobre o canal da aba ativa
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     try {
       const url = new URL(tabs[0].url);
@@ -114,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const path = url.pathname.split('/');
         currentChannel = path[1] ? path[1].toLowerCase() : 'unknown';
         if (currentChannel !== 'unknown' && currentChannel !== 'directory') {
-          channelTitle.textContent = `Dungeon: ${currentChannel}`;
+          channelTitle.textContent = t('overlayTitle', currentChannel);
           verificarELimparInativos();
         }
       }
@@ -129,25 +164,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const umaHoraEmMs = 60 * 60 * 1000;
       const agora = Date.now();
       let mudou = false;
-
       for (const ch in activity) {
         if (agora - activity[ch] > umaHoraEmMs) {
-          delete allData[ch];
-          delete activity[ch];
-          mudou = true;
+          delete allData[ch]; delete activity[ch]; mudou = true;
         }
       }
-
-      if (currentChannel !== 'unknown') {
-        activity[currentChannel] = agora;
-        mudou = true;
-      }
-
-      if (mudou) {
-        chrome.storage.local.set({ kukoro_data: allData, channel_activity: activity }, () => {
-          updateList();
-        });
-      }
+      if (currentChannel !== 'unknown') { activity[currentChannel] = agora; mudou = true; }
+      if (mudou) chrome.storage.local.set({ kukoro_data: allData, channel_activity: activity }, () => updateList());
     });
   }
 
@@ -156,21 +179,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const allData = result.kukoro_data || {};
       const players = allData[currentChannel] || {};
       const searchTerm = searchInput.value.toLowerCase();
-      
       const allIds = Object.keys(players);
       
-      // Identifica quais classes de inimigos estão presentes na partida (via skills dos players)
       let detectedEnemies = new Set();
       allIds.forEach(id => {
-        const p = players[id];
-        if (!p.isPending) {
-          const v = identificarVantagens(p.skills);
-          v.classes.forEach(c => detectedEnemies.add(c));
-        }
+        if (!players[id].isPending) identificarVantagens(players[id].skills).classes.forEach(c => detectedEnemies.add(c));
       });
       renderEnemyFilters(Array.from(detectedEnemies).sort());
 
-      // Lógica de Limpeza Automática
       const anyAlive = allIds.some(id => !players[id].isDead);
       if (allIds.length > 0 && !anyAlive) {
         if (!autoClearTimeout) {
@@ -179,189 +195,98 @@ document.addEventListener('DOMContentLoaded', () => {
               const finalData = finalResult.kukoro_data || {};
               const finalPlayers = finalData[currentChannel] || {};
               const finalIds = Object.keys(finalPlayers);
-              if (finalIds.length > 0 && !finalIds.some(id => !finalPlayers[id].isDead)) {
-                clearChannelData();
-              }
+              if (finalIds.length > 0 && !finalIds.some(id => !finalPlayers[id].isDead)) clearChannelData();
               autoClearTimeout = null;
             });
           }, 5000);
         }
-      } else if (autoClearTimeout) {
-        clearTimeout(autoClearTimeout);
-        autoClearTimeout = null;
-      }
+      } else if (autoClearTimeout) { clearTimeout(autoClearTimeout); autoClearTimeout = null; }
 
       totalCountEl.textContent = allIds.length;
       if (allIds.length > 16) totalCountEl.parentElement.classList.add('warning-blink');
       else totalCountEl.parentElement.classList.remove('warning-blink');
 
-      // Filtragem
       const filteredIds = allIds.filter(id => {
-        const p = players[id];
-        const v = identificarVantagens(p.skills || "");
-        
-        let matchesSearch = false;
-        if (searchTerm.startsWith('@')) {
-          matchesSearch = p.name.toLowerCase().includes(searchTerm.slice(1));
-        } else {
-          matchesSearch = p.name.toLowerCase().includes(searchTerm) || (p.skills || "").toLowerCase().includes(searchTerm);
-        }
-        
-        let matchesStatus = true;
-        if (currentFilter === 'alive') matchesStatus = !p.isDead;
-        if (currentFilter === 'dead') matchesStatus = !!p.isDead;
-
-        // Lógica de Vantagem Corrigida:
-        // Se filtrei por "Diabrete", mostro quem tem vantagem contra "Diabrete" 
-        // OU quem tem vantagem genérica contra "Maldito" (se Diabrete for Maldito).
-        // NÃO deve mostrar quem tem vantagem apenas contra "Esqueleto".
-        let matchesEnemy = currentEnemyFilter === 'all';
-        if (!matchesEnemy) {
-          const infoDoFiltro = ENEMY_MAPPING[currentEnemyFilter];
-          const subDoFiltro = infoDoFiltro?.sub;
-          
-          // Verifica se o player tem a classe exata filtrada
+        const p = players[id]; const v = identificarVantagens(p.skills || "");
+        let mS = searchTerm.startsWith('@') ? p.name.toLowerCase().includes(searchTerm.slice(1)) : (p.name.toLowerCase().includes(searchTerm) || (p.skills || "").toLowerCase().includes(searchTerm));
+        let mSt = currentFilter === 'all' || (currentFilter === 'alive' ? !p.isDead : !!p.isDead);
+        let mE = currentEnemyFilter === 'all';
+        if (!mE) {
+          const info = ENEMY_MAPPING[currentEnemyFilter];
+          const sub = info?.sub;
           const temClasseExata = v.classes.includes(currentEnemyFilter);
+          const sL = (p.skills || "").toLowerCase();
           
-          // Verifica se o player tem vantagem genérica contra a SUBCLASSE do filtro
-          // IMPORTANTE: Só consideramos vantagem genérica se a palavra da subclasse estiver na habilidade,
-          // não se ele tem vantagem contra OUTRA classe da mesma subclasse.
-          const skillsLower = (p.skills || "").toLowerCase();
-          const temVantagemGenericaSub = subDoFiltro && (skillsLower.includes(subDoFiltro.toLowerCase()) || (subDoFiltro === "Humanóide" && skillsLower.includes("humanoide")));
-
-          matchesEnemy = temClasseExata || temVantagemGenericaSub;
+          // Lógica de herança de subclasse corrigida para novos IDs
+          const subKey = sub ? `sub${sub}` : null;
+          const subName = subKey ? t(subKey).toLowerCase() : "";
+          const temVantagemGenericaSub = sub && (sL.includes(subName) || (sub === "Humanoid" && sL.includes("humanoide")));
+          
+          mE = temClasseExata || temVantagemGenericaSub;
         }
-
-        return matchesSearch && matchesStatus && matchesEnemy;
+        return mS && mSt && mE;
       });
 
-      // Contador de Filtrados
-      const hasFilter = searchTerm !== '' || currentFilter !== 'all' || currentEnemyFilter !== 'all';
-      if (hasFilter) {
-        filteredContainer.style.display = 'block';
-        filteredCountEl.textContent = filteredIds.length;
-      } else {
-        filteredContainer.style.display = 'none';
-      }
+      const hasF = searchTerm !== '' || currentFilter !== 'all' || currentEnemyFilter !== 'all';
+      filteredContainer.style.display = hasF ? 'block' : 'none';
+      filteredCountEl.textContent = filteredIds.length;
 
-      // Renderiza Lista de Nicks (Aba Jogadores)
       nickList.innerHTML = '';
       allIds.sort().forEach(id => {
-        const p = players[id];
-        const item = document.createElement('div');
-        item.style.display = 'flex';
-        item.style.justifyContent = 'space-between';
-        item.style.padding = '2px 0';
-        
-        const nameSpan = document.createElement('span');
-        nameSpan.textContent = p.name;
+        const p = players[id]; const item = document.createElement('div');
+        item.style.cssText = 'display:flex; justify-content:space-between; padding:2px 0;';
+        const nameSpan = document.createElement('span'); nameSpan.textContent = p.name;
         if (p.isDead) nameSpan.style.color = '#666';
         item.appendChild(nameSpan);
-
         if (p.isPending) {
-          const warnSpan = document.createElement('span');
-          warnSpan.textContent = '⚠️';
-          item.appendChild(warnSpan);
+          const w = document.createElement('span'); w.textContent = '⚠️'; w.title = t('statusAguardando'); item.appendChild(w);
         } else {
           const v = identificarVantagens(p.skills || "");
-          const todasVantagens = [...v.classes, ...v.subs];
-          const labelsParaMostrar = [...new Set(todasVantagens)].filter(label => {
-            const subclasseConhecida = ["Humanóide", "Besta", "Maldito"];
-            if (subclasseConhecida.includes(label)) {
-              const temClasseEspecificaDessaSub = v.classes.some(classe => ENEMY_MAPPING[classe].sub === label);
-              return !temClasseEspecificaDessaSub;
-            }
-            return true;
+          const labels = [...v.classes.map(c => t(`class${c}`)), ...v.subs.map(s => t(`sub${s}`))];
+          // Otimização de labels na lista de nicks
+          const finalLabels = labels.filter(l => {
+             const foundClassId = Object.keys(ENEMY_MAPPING).find(cid => t(`class${cid}`) === l);
+             if (foundClassId) return true;
+             // Se for label de sub, checa se alguma classe dela já está presente por tradução
+             const subId = ["Humanoid", "Beast", "Cursed"].find(sid => t(`sub${sid}`) === l);
+             if (subId) return !v.classes.some(cid => ENEMY_MAPPING[cid].sub === subId);
+             return true;
           });
-
-          if (labelsParaMostrar.length > 0) {
-            const vSpan = document.createElement('span');
-            vSpan.style.fontSize = '0.7em';
-            vSpan.style.color = '#00ffcc';
-            vSpan.textContent = labelsParaMostrar.join(', ');
-            item.appendChild(vSpan);
+          if (finalLabels.length > 0) {
+            const vs = document.createElement('span'); vs.style.cssText = 'font-size:0.7em; color:#00ffcc;'; vs.textContent = finalLabels.join(', '); item.appendChild(vs);
           }
         }
         nickList.appendChild(item);
       });
 
       if (filteredIds.length === 0) {
-        noData.style.display = 'block';
-        playerList.innerHTML = '';
-        return;
+        noData.textContent = (searchTerm || currentFilter !== 'all' || currentEnemyFilter !== 'all') ? t('msgNoResults') : (currentChannel === 'unknown' ? t('msgOpenLive') : t('msgNoData'));
+        noData.style.display = 'block'; playerList.innerHTML = ''; return;
       }
 
-      noData.style.display = 'none';
-      playerList.innerHTML = '';
-
+      noData.style.display = 'none'; playerList.innerHTML = '';
       const sortType = sortSelect.value;
-      const sortedIds = filteredIds.sort((a, b) => {
-        const pa = players[a];
-        const pb = players[b];
+      filteredIds.sort((a, b) => {
+        const pa = players[a], pb = players[b];
         if (sortType === 'lv_desc') return (parseInt(pb.lv) || 0) - (parseInt(pa.lv) || 0);
         if (sortType === 'lv_asc') return (parseInt(pa.lv) || 0) - (parseInt(pb.lv) || 0);
         if (sortType === 'name_asc') return pa.name.localeCompare(pb.name);
-        // Default: recent
         return new Date(pb.lastUpdate) - new Date(pa.lastUpdate);
-      });
-
-      sortedIds.forEach(id => {
-        const p = players[id];
-        const v = identificarVantagens(p.skills || "");
-        const card = document.createElement('div');
-        card.className = `player-card ${p.isDead ? 'dead' : ''}`;
-        
+      }).forEach(id => {
+        const p = players[id]; const v = identificarVantagens(p.skills || "");
+        const card = document.createElement('div'); card.className = `player-card ${p.isDead ? 'dead' : ''}`;
         if (p.isPending) {
           card.style.borderStyle = 'dashed';
-          card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div class="player-name">@${p.name} <span style="font-size: 0.8em; color: #ffcc00;">[Aguardando Dados]</span></div>
-            </div>
-            <div style="margin-top: 10px; font-size: 0.85em; color: #adadb8; font-style: italic;">
-              Aguardando !getinfo...
-            </div>
-            <div style="margin-top: 8px; display: flex; justify-content: flex-end;">
-              <button class="status-btn" style="padding: 4px 8px; font-size: 0.75em; cursor: pointer; background: #444; color: white; border: none; border-radius: 4px;">Morto</button>
-            </div>
-          `;
+          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div class="player-name">@${p.name} <span style="font-size:0.8em; color:#ffcc00;">[${t('statusAguardando')}]</span></div><div style="font-size:0.65em; color:#adadb8; background:#333; padding:2px 5px; border-radius:4px;">${t('statusPendente')}</div></div><div style="margin-top:10px; font-size:0.85em; color:#adadb8; font-style:italic;">${t('msgPendingInfo')}</div><div style="margin-top:8px; display:flex; justify-content:flex-end;"><button class="status-btn" style="padding:4px 8px; font-size:0.75em; cursor:pointer; background:#444; color:white; border:none; border-radius:4px;">${t('btnMorto')}</button></div>`;
         } else {
-          // Lógica de labels otimizada: esconde a subclasse se uma classe específica dela já existir
-          const todasVantagens = [...v.classes, ...v.subs];
-          const labelsParaMostrar = [...new Set(todasVantagens)].filter(label => {
-            // Se for uma subclasse (Humanóide, Besta, Maldito)
-            const subclasseConhecida = ["Humanóide", "Besta", "Maldito"];
-            if (subclasseConhecida.includes(label)) {
-              // Só mostra se NÃO houver nenhuma classe específica dessa mesma subclasse na lista
-              const temClasseEspecificaDessaSub = v.classes.some(classe => ENEMY_MAPPING[classe].sub === label);
-              return !temClasseEspecificaDessaSub;
-            }
-            return true; // Classes específicas sempre mostram
+          const labels = [...new Set([...v.classes.map(c => ({id: c, type:'class'})), ...v.subs.map(s => ({id: s, type:'sub'}))])].filter(item => {
+            if (item.type === 'sub') return !v.classes.some(cid => ENEMY_MAPPING[cid].sub === item.id);
+            return true;
           });
-
-          card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div class="player-name">@${p.name} <span style="font-size: 0.8em; color: #adadb8;">[Lv. ${p.lv}]</span></div>
-              <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; max-width: 50%;">
-                ${labelsParaMostrar.map(label => {
-                  let color = '#00ffcc';
-                  if (label === 'Humanóide') color = '#ffcc00';
-                  if (label === 'Maldito') color = '#ff4b4b';
-                  return `<div style="font-size: 0.6em; color: ${color}; border: 1px solid ${color}; padding: 1px 5px; border-radius: 10px; font-weight: bold; text-transform: uppercase; white-space: nowrap;">${label}</div>`;
-                }).join('')}
-              </div>
-            </div>
-            <div class="stats">
-              <div><span class="stat-label">DEF:</span> ${p.def}</div>
-              <div><span class="stat-label">AGI:</span> ${p.agi}</div>
-              <div><span class="stat-label">CRIT:</span> ${p.crit}</div>
-            </div>
-            <div class="skills">${p.skills}</div>
-            <div style="margin-top: 8px; display: flex; justify-content: flex-end;">
-              <button class="status-btn" style="padding: 4px 8px; font-size: 0.75em; cursor: pointer; background: ${p.isDead ? '#444' : '#9147ff'}; color: white; border: none; border-radius: 4px;">
-                ${p.isDead ? 'Reviver' : 'Morto'}
-              </button>
-            </div>
-          `;
+          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div class="player-name">@${p.name} <span style="font-size:0.8em; color:#9e9e9e;">[Lv. ${p.lv}]</span></div><div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; max-width:50%;">${labels.map(item => {
+            let c = '#4db8ff'; if (item.id === 'Humanoid') c = '#d4af37'; if (item.id === 'Cursed') c = '#ff5252';
+            return `<div style="font-size:0.6em; color:${c}; border:1px solid ${c}; padding:1px 5px; border-radius:10px; font-weight:bold; text-transform:uppercase; white-space:nowrap;">${t(item.type === 'class' ? `class${item.id}` : `sub${item.id}`)}</div>`;
+          }).join('')}</div></div><div class="stats"><div><span class="stat-label">DEF:</span> ${p.def}</div><div><span class="stat-label">AGI:</span> ${p.agi}</div><div><span class="stat-label">CRIT:</span> ${p.crit}</div></div><div class="skills">${p.skills}</div><div style="margin-top:8px; display:flex; justify-content:flex-end;"><button class="status-btn" style="padding:4px 8px; font-size:0.75em; cursor:pointer; background:${p.isDead ? '#333' : '#d4af37'}; color:${p.isDead ? 'white' : '#121212'}; border:none; border-radius:4px; font-weight:bold;">${p.isDead ? t('btnReviver') : t('btnMorto')}</button></div>`;
         }
         card.querySelector('.status-btn').addEventListener('click', () => togglePlayerStatus(id));
         playerList.appendChild(card);
@@ -370,115 +295,65 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderEnemyFilters(enemies) {
-    // Só renderiza se os inimigos detectados mudarem ou se for a primeira vez
-    const currentBtns = Array.from(enemyFiltersContainer.querySelectorAll('.sub-filter-btn:not([data-sub="all"])')).map(b => b.dataset.sub);
-    if (JSON.stringify(currentBtns) === JSON.stringify(enemies)) return;
-
+    const current = Array.from(enemyFiltersContainer.querySelectorAll('.sub-filter-btn:not([data-sub="all"])')).map(b => b.dataset.sub);
+    if (JSON.stringify(current) === JSON.stringify(enemies)) return;
     enemyFiltersContainer.innerHTML = '';
-    
-    // Botão "Todos" simplificado
-    const allBtn = document.createElement('button');
-    allBtn.className = `sub-filter-btn ${currentEnemyFilter === 'all' ? 'active' : ''}`;
-    allBtn.dataset.sub = 'all';
-    allBtn.textContent = 'Todos';
-    styleSubBtn(allBtn);
-    allBtn.addEventListener('click', () => selectEnemyFilter('all', allBtn));
-    enemyFiltersContainer.appendChild(allBtn);
-
-    enemies.forEach(enemy => {
-      const btn = document.createElement('button');
-      btn.className = `sub-filter-btn ${currentEnemyFilter === enemy ? 'active' : ''}`;
-      btn.dataset.sub = enemy;
-      btn.textContent = enemy;
-      styleSubBtn(btn);
-      btn.addEventListener('click', () => selectEnemyFilter(enemy, btn));
+    const addBtn = (id, sub) => {
+      const btn = document.createElement('button'); btn.className = `sub-filter-btn ${currentEnemyFilter === sub ? 'active' : ''}`;
+      btn.dataset.sub = sub; btn.textContent = sub === 'all' ? t('labelTodos') : t(`class${id}`);
+      btn.style.cssText = 'padding:3px 8px; font-size:0.7em; cursor:pointer; background:#1a1a1e; color:#adadb8; border:1px solid #444; border-radius:4px;';
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sub-filter-btn').forEach(b => b.classList.remove('active'));
+        if (currentEnemyFilter === sub && sub !== 'all') { currentEnemyFilter = 'all'; document.querySelector('.sub-filter-btn[data-sub="all"]').classList.add('active'); }
+        else { btn.classList.add('active'); currentEnemyFilter = sub; }
+        updateList();
+      });
       enemyFiltersContainer.appendChild(btn);
-    });
+    };
+    addBtn(null, 'all');
+    enemies.forEach(e => addBtn(e, e));
   }
 
-  function styleSubBtn(btn) {
-    btn.style.padding = '3px 8px';
-    btn.style.fontSize = '0.7em';
-    btn.style.cursor = 'pointer';
-    btn.style.background = '#1a1a1e';
-    btn.style.color = '#adadb8';
-    btn.style.border = '1px solid #444';
-    btn.style.borderRadius = '4px';
-  }
-
-  function selectEnemyFilter(enemy, btn) {
-    const isAlreadyActive = btn.classList.contains('active');
-    document.querySelectorAll('.sub-filter-btn').forEach(b => b.classList.remove('active'));
-    
-    if (isAlreadyActive && enemy !== 'all') {
-      currentEnemyFilter = 'all';
-      document.querySelector('.sub-filter-btn[data-sub="all"]').classList.add('active');
-    } else {
-      btn.classList.add('active');
-      currentEnemyFilter = enemy;
-    }
-    updateList();
-  }
-
-  function togglePlayerStatus(playerId) {
-    chrome.storage.local.get(['kukoro_data'], (result) => {
-      let allData = result.kukoro_data || {};
-      if (allData[currentChannel] && allData[currentChannel][playerId]) {
-        allData[currentChannel][playerId].isDead = !allData[currentChannel][playerId].isDead;
-        chrome.storage.local.set({ kukoro_data: allData }, () => updateList());
+  function togglePlayerStatus(id) {
+    chrome.storage.local.get(['kukoro_data'], res => {
+      let d = res.kukoro_data || {}; if (d[currentChannel] && d[currentChannel][id]) {
+        d[currentChannel][id].isDead = !d[currentChannel][id].isDead; chrome.storage.local.set({ kukoro_data: d }, updateList);
       }
     });
   }
 
   function clearChannelData() {
-    chrome.storage.local.get(['kukoro_data'], (result) => {
-      let allData = result.kukoro_data || {};
-      delete allData[currentChannel];
-      chrome.storage.local.set({ kukoro_data: allData }, () => updateList());
+    chrome.storage.local.get(['kukoro_data'], res => {
+      let d = res.kukoro_data || {}; delete d[currentChannel]; chrome.storage.local.set({ kukoro_data: d }, updateList);
     });
   }
 
-  // Event Listeners
   searchInput.addEventListener('input', updateList);
   sortSelect.addEventListener('change', updateList);
-  
   resetFiltersBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    currentFilter = 'all';
-    currentEnemyFilter = 'all';
-    filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
-    updateList();
+    searchInput.value = ''; currentFilter = 'all'; currentEnemyFilter = 'all';
+    filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'all')); updateList();
   });
 
   filterBtns.forEach(btn => btn.addEventListener('click', () => {
-    filterBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = btn.dataset.filter;
-    updateList();
+    filterBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentFilter = btn.dataset.filter; updateList();
   }));
 
   tabBtns.forEach(btn => btn.addEventListener('click', () => {
-    tabBtns.forEach(b => {
-      b.classList.toggle('active', b === btn);
-      b.style.color = (b === btn) ? 'white' : '#adadb8';
-    });
-    const tab = btn.dataset.tab;
-    tabPlayers.style.display = (tab === 'players') ? 'block' : 'none';
-    tabNicks.style.display = (tab === 'nicks') ? 'block' : 'none';
-    updateList();
+    tabBtns.forEach(b => { b.classList.toggle('active', b === btn); b.style.color = (b === btn) ? 'white' : '#adadb8'; });
+    const tab = btn.dataset.tab; tabPlayers.style.display = (tab === 'players') ? 'block' : 'none'; tabNicks.style.display = (tab === 'nicks') ? 'block' : 'none'; updateList();
   }));
 
   copyNicksBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(nickList.textContent).then(() => {
-      const originalText = copyNicksBtn.textContent;
-      copyNicksBtn.textContent = 'Copiado!';
-      setTimeout(() => copyNicksBtn.textContent = originalText, 2000);
+    navigator.clipboard.writeText(nickList.innerText).then(() => {
+      const old = copyNicksBtn.textContent; copyNicksBtn.textContent = t('copied'); setTimeout(() => copyNicksBtn.textContent = old, 2000);
     });
   });
 
   document.getElementById('clear-btn').addEventListener('click', () => {
-    if (confirm(`Limpar dados de ${currentChannel}?`)) clearChannelData();
+    if (confirm(t('confirmLimpar', currentChannel))) clearChannelData();
   });
 
+  applyTranslations();
   setInterval(updateList, 10000);
 });

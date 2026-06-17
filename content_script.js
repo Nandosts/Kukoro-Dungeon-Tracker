@@ -1,7 +1,7 @@
 console.log("Kukoro Dungeon Tracker: Content Script carregado.");
 
-const KUKORO_REGEX_ALT = /\[KUKORO\]\s+(?<name>[\w_]+)\s+\(Lv\.\s+(?<lv>\d+),\s+Df\.\s+(?<def>[\d%]+),\s+Crit\.\s+(?<crit>[\d%]+),\s+Agi\.\s+(?<agi>[\d%]+)\)\s+>\s+(?<skills>.*)/i;
-const KUKORO_REGEX_CLASSIC = /@?(?<name>[\w_]+)\s+\[Lv\.\s+(?<lv>\d+)\]\s+HP:\s+(?<hp>\d+)\s+\|\s+ATK:\s+(?<atk>\d+)\s+\|\s+DEF:\s+(?<def>[\d%]+)\s+\|\s+AGI:\s+(?<agi>\d+)\s+\|\s+CRIT:\s+(?<crit>[\d%]+)\s+\|\s+Habilidades:\s+(?<skills>.*)/i;
+const KUKORO_REGEX_ALT = /\[KUKORO\]\s+(?<name>[\w\-]+)\s+\((?:Lv|Nv)\.\s+(?<lv>\d+),\s+Df\.\s+(?<def>[\d%]+),\s+(?:Crit|Crít)\.\s+(?<crit>[\d%]+),\s+Agi\.\s+(?<agi>[\d%]+)\)\s+>\s*(?<skills>.*)/i;
+const KUKORO_REGEX_CLASSIC = /@?(?<name>[\w\-]+)\s+\[(?:Lv|Nv)\.\s+(?<lv>\d+)\]\s+HP:\s+(?<hp>\d+)\s+\|\s+ATK:\s+(?<atk>\d+)\s+\|\s+DEF:\s+(?<def>[\d%]+)\s+\|\s+AGI:\s+(?<agi>\d+)\s+\|\s+CRIT:\s+(?<crit>[\d%]+)\s+\|\s+(?:Habilidades|Skills|Habilidades):\s+(?<skills>.*)/i;
 
 function getChannelName() {
   const path = window.location.pathname.split('/');
@@ -130,16 +130,42 @@ setInterval(limparCanaisInativos, 5 * 60 * 1000);
 let chatObserver = null;
 
 function iniciarObservador() {
-  const chatContainer = document.querySelector('.chat-scrollable-area__message-container') || 
-                        document.querySelector('[data-test-selector="chat-scrollable-area__message-container"]') ||
+  // A Twitch atualizou o DOM. O container correto que recebe os nós é o message-container.
+  const chatContainer = document.querySelector('[data-test-selector="chat-scrollable-area__message-container"]') ||
+                        document.querySelector('.chat-scrollable-area__message-container') ||
+                        document.querySelector('.scrollable-area[data-a-target="chat-scroller"] > div') ||
                         document.querySelector('.chat-list--default .scrollable-area');
 
   if (chatContainer) {
     if (chatObserver) chatObserver.disconnect();
+    
+    // Log para confirmar que achou o chat
+    console.log("Kukoro Dungeon Tracker: Container do chat encontrado, iniciando observação.");
+    
     chatObserver = new MutationObserver((mutations) => {
+      let addedNodesList = [];
       for (const mutation of mutations) {
         for (const node of mutation.addedNodes) {
+          if (node.nodeType === 1) addedNodesList.push(node);
+        }
+      }
+
+      // Se a Twitch injetar um bloco gigante de mensagens (ex: ao recarregar a página),
+      // processamos apenas as últimas 8 para evitar pegar histórico antigo.
+      if (addedNodesList.length > 8) {
+        console.log(`Kukoro Dungeon Tracker: Ignorando histórico antigo, processando apenas as últimas 8 de ${addedNodesList.length} mensagens.`);
+        addedNodesList = addedNodesList.slice(-8);
+      }
+
+      for (const node of addedNodesList) {
+        if (node.classList && node.classList.contains('chat-line__message')) {
           processarMensagem(node);
+        } else {
+          const messages = node.querySelectorAll('.chat-line__message');
+          // Limita também caso o node seja um container com múltiplas mensagens
+          const msgsArray = Array.from(messages);
+          const recentMsgs = msgsArray.length > 8 ? msgsArray.slice(-8) : msgsArray;
+          recentMsgs.forEach(msgNode => processarMensagem(msgNode));
         }
       }
     });

@@ -82,34 +82,34 @@
   </div>
 
   <div style="display: flex; gap: 5px; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;">
-    <button class="tab-btn active" data-tab="players" style="flex: 1; padding: 8px; background: none; border: none; color: white; cursor: pointer; font-weight: bold;">Habilidades</button>
-    <button class="tab-btn" data-tab="nicks" style="flex: 1; padding: 8px; background: none; border: none; color: #adadb8; cursor: pointer;">Jogadores</button>
+    <button class="tab-btn active" data-tab="players" id="tab-habilidades" style="flex: 1; padding: 8px; background: none; border: none; color: white; cursor: pointer; font-weight: bold;">Habilidades</button>
+    <button class="tab-btn" data-tab="nicks" id="tab-jogadores" style="flex: 1; padding: 8px; background: none; border: none; color: #adadb8; cursor: pointer;">Jogadores</button>
   </div>
 
   <div id="tab-players">
     <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.85em; background: #26262c; padding: 8px; border-radius: 4px;">
-      <div>Total: <span id="total-count">0</span>/16</div>
-      <div id="filtered-container" style="display: none;">Filtrados: <span id="filtered-count">0</span></div>
+      <div><span id="text-total">Total</span>: <span id="total-count">0</span>/16</div>
+      <div id="filtered-container" style="display: none;"><span id="text-filtrados">Filtrados</span>: <span id="filtered-count">0</span></div>
     </div>
 
     <div style="display: flex; gap: 5px; margin-bottom: 10px;">
       <input type="text" id="search-input" placeholder="Pesquisar nome ou habilidade..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #333; background: #26262c; color: white; box-sizing: border-box; min-width: 0;">
       <select id="sort-select" style="padding: 5px; background: #26262c; color: white; border: 1px solid #333; border-radius: 4px; font-size: 0.8em; outline: none; cursor: pointer;">
-        <option value="recent">Recentes</option>
-        <option value="lv_desc">Maior Nível</option>
-        <option value="lv_asc">Menor Nível</option>
-        <option value="name_asc">A-Z</option>
+        <option value="recent" id="opt-recent">Recentes</option>
+        <option value="lv_desc" id="opt-lv-desc">Maior Nível</option>
+        <option value="lv_asc" id="opt-lv-asc">Menor Nível</option>
+        <option value="name_asc" id="opt-name-asc">A-Z</option>
       </select>
       <button id="reset-filters" title="Limpar todos os filtros" style="padding: 0 10px; background: #333; color: #adadb8; border: 1px solid #444; border-radius: 4px; cursor: pointer; font-size: 0.8em;">✕</button>
     </div>
     
     <div style="display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap;">
-      <button class="filter-btn active" data-filter="all" style="flex: 1; min-width: 60px; padding: 5px; font-size: 0.75em; cursor: pointer; background: #333; color: white; border: none; border-radius: 4px;">Todos</button>
-      <button class="filter-btn" data-filter="alive" style="flex: 1; min-width: 60px; padding: 5px; font-size: 0.75em; cursor: pointer; background: #333; color: white; border: none; border-radius: 4px;">Vivos</button>
-      <button class="filter-btn" data-filter="dead" style="flex: 1; min-width: 60px; padding: 5px; font-size: 0.75em; cursor: pointer; background: #333; color: white; border: none; border-radius: 4px;">Mortos</button>
+      <button class="filter-btn active" data-filter="all" id="filter-all" style="flex: 1; min-width: 60px; padding: 5px; font-size: 0.75em; cursor: pointer; background: #333; color: white; border: none; border-radius: 4px;">Todos</button>
+      <button class="filter-btn" data-filter="alive" id="filter-alive" style="flex: 1; min-width: 60px; padding: 5px; font-size: 0.75em; cursor: pointer; background: #333; color: white; border: none; border-radius: 4px;">Vivos</button>
+      <button class="filter-btn" data-filter="dead" id="filter-dead" style="flex: 1; min-width: 60px; padding: 5px; font-size: 0.75em; cursor: pointer; background: #333; color: white; border: none; border-radius: 4px;">Mortos</button>
     </div>
 
-    <div style="font-size: 0.75em; color: #adadb8; margin-bottom: 5px;">Vantagem contra inimigos detectados:</div>
+    <div style="font-size: 0.75em; color: #adadb8; margin-bottom: 5px;" id="text-vantagem">Vantagem contra inimigos detectados:</div>
     <div id="enemy-filters" style="display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap;">
       <!-- Filtros dinâmicos inseridos via JS -->
     </div>
@@ -120,11 +120,30 @@
     <button id="clear-btn" style="width: 100%; padding: 8px; background: #eb0400; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Limpar Canal</button>
     
     <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #333; padding-top: 10px;">
-      <span style="font-size: 0.85em; color: #adadb8;">Mostrar Overlay na Twitch</span>
+      <span style="font-size: 0.85em; color: #adadb8;" id="text-show-overlay">Mostrar Overlay na Twitch</span>
       <label class="switch" title="Mostrar/Ocultar Janela Flutuante">
         <input type="checkbox" id="overlay-switch">
         <span class="slider round"></span>
       </label>
+    </div>
+
+    <!-- Rodapé de Doação Opcional -->
+    <div style="margin-top: 15px; border-top: 1px dashed #333; padding-top: 10px; text-align: center;">
+      <div style="font-size: 0.75em; color: #adadb8; margin-bottom: 8px;" id="text-support-dev">Apoie o desenvolvimento desta extensão:</div>
+      <div style="display: flex; justify-content: center; gap: 10px;">
+        
+        <!-- Botão Pix -->
+        <button id="btn-copy-pix" title="Copiar Chave Pix" style="display: flex; align-items: center; gap: 5px; background: #32bcad; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 0.75em; font-weight: bold; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
+          <svg viewBox="0 0 512 512" width="12" height="12" fill="currentColor"><path d="M125.8 190.5L39 277.4c-9 9-9 23.5 0 32.5l86.8 86.8c9 9 23.5 9 32.5 0l21-21-65.3-65.3c-9-9-9-23.5 0-32.5l65.3-65.3-21-21c-9-9-23.5-9-32.5 0zM386.2 321.5l86.8-86.8c9-9 9-23.5 0-32.5l-86.8-86.8c-9-9-23.5-9-32.5 0l-21 21 65.3 65.3c9 9 9 23.5 0 32.5L332.7 300l21 21c9 9 23.5 9 32.5.5zM224 224l32-32 32 32-32 32-32-32z"></path></svg>
+          <span id="text-pix-btn">Pix</span>
+        </button>
+
+        <!-- Botão StreamElements -->
+        <a href="https://streamelements.com/nando_sts/tip" target="_blank" style="display: flex; align-items: center; gap: 5px; background: #2f2f2f; color: white; border: 1px solid #444; border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 0.75em; font-weight: bold; text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='#444'" onmouseout="this.style.background='#2f2f2f'">
+          ☕ <span id="text-tip-btn">Tip</span>
+        </a>
+
+      </div>
     </div>
   </div>
 

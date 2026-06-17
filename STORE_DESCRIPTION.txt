@@ -1,0 +1,53 @@
+# Sugestões de Nomes:
+1. Kukoro Dungeon Helper
+2. Raid Tracker for Kukoro
+3. Dungeon Tactical Overlay
+4. Kukoro Stats Master
+
+# Descrição para a Loja (Chrome Web Store):
+
+[PT-BR]
+Otimize sua estratégia no Kukoro Dungeon Raid com esta extensão tática definitiva! 
+
+Funcionalidades:
+- Overlay Flutuante: Uma janela arrastável e redimensionável diretamente na sua live da Twitch.
+- Captura Automática: Detecta nicks e atributos via comandos !getinfo e !kukoro em tempo real.
+- Filtros Inteligentes: Encontre jogadores com vantagens contra inimigos específicos (Aranha, Esqueleto, Dragão, etc).
+- Gestão de Vivos/Mortos: Marque jogadores eliminados com um clique para focar no que resta da raid.
+- Auto-Limpeza: Os dados expiram após 1h de inatividade ou ao marcar todos como mortos.
+- Multi-idioma: Suporte completo para Português, Inglês e Espanhol.
+- Privacidade: Funciona inteiramente no seu navegador, sem coletar dados externos.
+
+Contato: Para bugs ou sugestões, mande um sussurro para nando_sts em https://www.twitch.tv/nando_sts
+
+---
+
+[EN]
+Optimize your Kukoro Dungeon Raid strategy with the ultimate tactical extension!
+
+Features:
+- Floating Overlay: A draggable and resizable window directly on your Twitch stream.
+- Auto-Capture: Detects names and attributes via !getinfo and !kukoro commands in real-time.
+- Smart Filters: Find players with advantages against specific enemies (Spider, Skeleton, Dragon, etc).
+- Life Status: Mark eliminated players with one click to focus on the remaining raid.
+- Auto-Clear: Data expires after 1h of inactivity or when all players are marked as dead.
+- Multi-language: Full support for English, Portuguese, and Spanish.
+- Privacy: Works entirely in your browser, no external data collection.
+
+Contact: For bugs or suggestions, whisper nando_sts at https://www.twitch.tv/nando_sts
+
+---
+
+[ES]
+¡Optimiza tu estrategia en Kukoro Dungeon Raid com la extensión táctica definitiva!
+
+Características:
+- Overlay Flotante: Una ventana arrastrable y redimensionable directamente en tu directo de Twitch.
+- Captura Automática: Detecta nombres y atributos mediante comandos !getinfo y !kukoro en tiempo real.
+- Filtros Inteligentes: Encuentra jugadores con ventajas contra enemigos específicos (Araña, Esqueleto, Dragón, etc).
+- Gestión de Vivos/Muertos: Marca a los jugadores eliminados con un clic para centrarte en el resto de la raid.
+- Limpieza Automática: Los datos caducan tras 1h de inactividad o al marcar a todos como muertos.
+- Multi-idioma: Soporte completo para Español, Inglés y Portugués.
+- Privacidad: Funciona íntegramente en tu navegador, sin recolección de datos externos.
+
+Contacto: Para errores o sugerencias, envía un susurro a nando_sts en https://www.twitch.tv/nando_sts
