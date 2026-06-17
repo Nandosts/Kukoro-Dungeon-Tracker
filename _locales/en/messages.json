@@ -59,5 +59,10 @@
   "msgPendingInfo": { "message": "This player typed !kukoro but !getinfo hasn't been captured yet." },
   "showOverlayLabel": { "message": "Show Overlay on Twitch" },
   "textSupportDev": { "message": "Support the development of this extension:" },
-  "btnTip": { "message": "Tip" }
+  "btnTip": { "message": "Tip" },
+  "tooltipClear": { "message": "Clear Channel Quickly" },
+  "tooltipPower": { "message": "Enable/Disable Extension" },
+  "tooltipMinimize": { "message": "Minimize" },
+  "tooltipClose": { "message": "Close Overlay" },
+  "tooltipReset": { "message": "Clear all filters" }
 }

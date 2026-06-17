@@ -49,6 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('text-tip-btn').textContent = t('btnTip');
     document.querySelector('#disabled-overlay div:nth-child(2)').textContent = t('overlayDisabled');
     document.querySelector('#disabled-overlay div:nth-child(3)').textContent = t('overlayEnableMsg');
+    
+    // Tooltips
+    resetFiltersBtn.title = t('tooltipReset');
+    powerSwitch.parentElement.title = t('tooltipPower');
+    overlaySwitch.parentElement.title = t('showOverlayLabel');
+    document.getElementById('btn-copy-pix').title = t('copied').replace('!', ''); // Reuso sutil
   }
 
   // Evento para copiar a chave Pix

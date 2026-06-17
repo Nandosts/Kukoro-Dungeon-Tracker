@@ -33,10 +33,10 @@ function injectKukoroOverlay() {
     <div id="kukoro-header" style="padding: 10px; background: #d4af37; color: #121212; cursor: move; display: flex; justify-content: space-between; align-items: center; user-select: none;">
       <span id="kukoro-title" style="font-weight: bold; font-size: 0.9em;">Kukoro Tracker</span>
       <div style="display: flex; gap: 8px; align-items: center;">
-        <button id="ov-quick-clear" title="Limpar Canal Rapidamente" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0;">🗑️</button>
-        <button id="ov-power-toggle" title="Ligar/Desligar Extensão" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0;">🟢</button>
-        <button id="kukoro-minimize" title="Minimizar" style="background: none; border: none; color: #121212; cursor: pointer; font-size: 1.2em; padding: 0 5px; font-weight: bold;">−</button>
-        <button id="ov-close-btn" title="Fechar Overlay" style="background: none; border: none; color: #121212; cursor: pointer; font-size: 1.1em; padding: 0 5px; font-weight: bold;">✕</button>
+        <button id="ov-quick-clear" title="${t('tooltipClear')}" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0;">🗑️</button>
+        <button id="ov-power-toggle" title="${t('tooltipPower')}" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0;">🟢</button>
+        <button id="kukoro-minimize" title="${t('tooltipMinimize')}" style="background: none; border: none; color: #121212; cursor: pointer; font-size: 1.2em; padding: 0 5px; font-weight: bold;">−</button>
+        <button id="ov-close-btn" title="${t('tooltipClose')}" style="background: none; border: none; color: #121212; cursor: pointer; font-size: 1.1em; padding: 0 5px; font-weight: bold;">✕</button>
       </div>
     </div>
     <div id="kukoro-body" style="padding: 10px; overflow-y: auto; flex: 1;">
@@ -333,10 +333,10 @@ function initOverlayLogic() {
     document.getElementById('ov-tab-nicks').style.display = b.dataset.tab==='nicks'?'block':'none';
   });
   document.getElementById('ov-clear-btn').onclick = () => {
-    if(confirm(t('confirmLimpar', window.location.pathname.split('/')[1]?.toLowerCase()))) {
-      const channel = window.location.pathname.split('/')[1]?.toLowerCase();
+    const channel = window.location.pathname.split('/')[1]?.toLowerCase();
+    if(confirm(t('confirmLimpar', channel))) {
       chrome.storage.local.get(['kukoro_data'], f => {
-        let d = f.kukoro_data; delete d[channel]; chrome.storage.local.set({ kukoro_data: d });
+        let d = f.kukoro_data || {}; delete d[channel]; chrome.storage.local.set({ kukoro_data: d });
       });
     }
   };

@@ -59,5 +59,10 @@
   "msgPendingInfo": { "message": "Este jugador escribió !kukoro pero o !getinfo aún no se ha capturado." },
   "showOverlayLabel": { "message": "Mostrar Overlay en Twitch" },
   "textSupportDev": { "message": "Apoya el desarrollo de esta extensión:" },
-  "btnTip": { "message": "Propina (Tip)" }
+  "btnTip": { "message": "Propina (Tip)" },
+  "tooltipClear": { "message": "Limpiar canal rápidamente" },
+  "tooltipPower": { "message": "Activar/Desactivar extensión" },
+  "tooltipMinimize": { "message": "Minimizar" },
+  "tooltipClose": { "message": "Cerrar Overlay" },
+  "tooltipReset": { "message": "Limpiar todos los filtros" }
 }
