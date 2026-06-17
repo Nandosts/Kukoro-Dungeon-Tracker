@@ -350,6 +350,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Mantém os toggles sincronizados se mudarem via Overlay ou outras abas
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local') {
+      if (changes.extension_enabled) {
+        powerSwitch.checked = changes.extension_enabled.newValue !== false;
+        updateUIState(powerSwitch.checked);
+      }
+      if (changes.overlay_enabled) {
+        overlaySwitch.checked = changes.overlay_enabled.newValue === true;
+      }
+    }
+  });
+
   document.getElementById('clear-btn').addEventListener('click', () => {
     if (confirm(t('confirmLimpar', currentChannel))) clearChannelData();
   });

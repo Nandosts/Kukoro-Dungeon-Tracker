@@ -36,6 +36,7 @@ function injectKukoroOverlay() {
         <button id="ov-quick-clear" title="Limpar Canal Rapidamente" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0;">🗑️</button>
         <button id="ov-power-toggle" title="Ligar/Desligar Extensão" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0;">🟢</button>
         <button id="kukoro-minimize" title="Minimizar" style="background: none; border: none; color: #121212; cursor: pointer; font-size: 1.2em; padding: 0 5px; font-weight: bold;">−</button>
+        <button id="ov-close-btn" title="Fechar Overlay" style="background: none; border: none; color: #121212; cursor: pointer; font-size: 1.1em; padding: 0 5px; font-weight: bold;">✕</button>
       </div>
     </div>
     <div id="kukoro-body" style="padding: 10px; overflow-y: auto; flex: 1;">
@@ -77,6 +78,7 @@ function injectKukoroOverlay() {
   const minBtn = document.getElementById('kukoro-minimize');
   const powerBtn = document.getElementById('ov-power-toggle');
   const quickClearBtn = document.getElementById('ov-quick-clear');
+  const closeBtn = document.getElementById('ov-close-btn');
   let isMinimized = false; let lastHeight = overlay.style.height;
 
   minBtn.addEventListener('click', () => {
@@ -101,6 +103,10 @@ function injectKukoroOverlay() {
         chrome.storage.local.set({ kukoro_data: d });
       });
     }
+  });
+
+  closeBtn.addEventListener('click', () => {
+    chrome.storage.local.set({ overlay_enabled: false });
   });
 
   initOverlayLogic();
