@@ -194,7 +194,10 @@ function initOverlayLogic() {
       const players = (res.kukoro_data || {})[channel] || {};
       const allIds = Object.keys(players);
 
-      if (!ovE || allIds.length === 0) { overlayEl.style.display = 'none'; if (allIds.length === 0) return; }
+      if (!ovE) { 
+        overlayEl.style.display = 'none'; 
+        return; 
+      }
       else overlayEl.style.display = 'flex';
 
       document.getElementById('ov-power-toggle').textContent = extE ? '🟢' : '🔴';
