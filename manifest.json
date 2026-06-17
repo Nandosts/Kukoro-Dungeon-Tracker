@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Kukoro Dungeon Tracker",
+  "version": "1.0",
+  "description": "Monitora e atualiza dados de jogadores do Kukoro Dungeon via chat da Twitch.",
+  "permissions": ["storage", "tabs"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.twitch.tv/*"],
+      "js": ["content_script.js", "overlay.js"]
+    }
+  ]
+}
