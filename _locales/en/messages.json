@@ -60,6 +60,8 @@
   "showOverlayLabel": { "message": "Show Overlay on Twitch" },
   "textSupportDev": { "message": "Support the development of this extension:" },
   "btnTip": { "message": "Tip" },
+  "tooltipStarted": { "message": "Started" },
+  "tooltipNotStarted": { "message": "Mark as Started" },
   "tooltipClear": { "message": "Clear Channel Quickly" },
   "tooltipPower": { "message": "Enable/Disable Extension" },
   "tooltipMinimize": { "message": "Minimize" },

@@ -33,6 +33,7 @@ function injectKukoroOverlay() {
     <div id="kukoro-header" style="padding: 10px; background: #d4af37; color: #121212; cursor: move; display: flex; justify-content: space-between; align-items: center; user-select: none;">
       <span id="kukoro-title" style="font-weight: bold; font-size: 0.9em;">Kukoro Tracker</span>
       <div style="display: flex; gap: 8px; align-items: center;">
+        <button id="ov-ready-btn" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0; opacity: 0.4; filter: grayscale(1); transition: 0.2s;">✅</button>
         <button id="ov-quick-clear" title="${t('tooltipClear')}" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0;">🗑️</button>
         <button id="ov-power-toggle" title="${t('tooltipPower')}" style="background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 0;">🟢</button>
         <button id="kukoro-minimize" title="${t('tooltipMinimize')}" style="background: none; border: none; color: #121212; cursor: pointer; font-size: 1.2em; padding: 0 5px; font-weight: bold;">−</button>
@@ -79,6 +80,8 @@ function injectKukoroOverlay() {
   const powerBtn = document.getElementById('ov-power-toggle');
   const quickClearBtn = document.getElementById('ov-quick-clear');
   const closeBtn = document.getElementById('ov-close-btn');
+  const readyBtn = document.getElementById('ov-ready-btn');
+
   let isMinimized = false; let lastHeight = overlay.style.height;
 
   minBtn.addEventListener('click', () => {
@@ -104,6 +107,16 @@ function injectKukoroOverlay() {
 
   closeBtn.addEventListener('click', () => {
     chrome.storage.local.set({ overlay_enabled: false });
+  });
+
+  readyBtn.addEventListener('click', () => {
+    const channel = window.location.pathname.split('/')[1]?.toLowerCase() || 'unknown';
+    chrome.storage.local.get(['channel_state'], (res) => {
+      let state = res.channel_state || {};
+      if (!state[channel]) state[channel] = {};
+      state[channel].isReady = !state[channel].isReady;
+      chrome.storage.local.set({ channel_state: state });
+    });
   });
 
   initOverlayLogic();
@@ -155,7 +168,7 @@ function initOverlayLogic() {
     "Dragon": { sub: "Beast", keywords: ["Dragão", "Dragon", "Dragón", "Wyvern"] },
     "Gargoyle": { sub: "Cursed", keywords: ["Gárgula", "Gargoyle", "Gárgola", "Gargola"] },
     "Goblin": { sub: "Humanoid", keywords: ["Goblin", "Batedor Goblin", "Lanceiro Goblin", "Goblin Montado"] },
-    "Human": { sub: "Humanoid", keywords: ["Humano", "Human", "Jogador", "Player"] },
+    "Human": { sub: "Humanoid", keywords: ["Humano", "Human"] },
     "Imp": { sub: "Cursed", keywords: ["Diabrete", "Imp", "Diablillo", "Diabretezinho", "Diabrete Alado"] },
     "Lizard": { sub: "Beast", keywords: ["Lagarto", "Lizard", "Lizardo", "Lanceiro Lagarto", "Guarda Lagarto"] },
     "Minotaur": { sub: "Beast", keywords: ["Minotauro", "Minotaur", "Cavaleiro Minotauro", "Fera Minotauro"] },
@@ -178,7 +191,7 @@ function initOverlayLogic() {
     let cls = []; let sbs = new Set();
     for (const [c, i] of Object.entries(ENEMY_MAPPING)) {
       if (i.keywords.some(k => new RegExp(`(^|[^\\p{L}])${k.toLowerCase()}([^\\p{L}]|$)`, 'iu').test(skL))) {
-        cls.push(c); if (i.sub !== "Unknown") sbs.add(t(`label${i.sub}`));
+        cls.push(c); if (i.sub !== "Unknown") sbs.add(t(`sub${i.sub}`));
       }
     }
     if (/(^|[^\p{L}])(humanóide|humanoide|humanoid)(-[^\p{L}]|$)/iu.test(skL)) sbs.add(t('labelHumanoide'));
@@ -191,15 +204,23 @@ function initOverlayLogic() {
 
   function update() {
     const channel = window.location.pathname.split('/')[1]?.toLowerCase() || 'unknown';
-    chrome.storage.local.get(['kukoro_data', 'extension_enabled', 'overlay_enabled'], (res) => {
+    chrome.storage.local.get(['kukoro_data', 'extension_enabled', 'overlay_enabled', 'channel_state'], (res) => {
       const extE = res.extension_enabled !== false; const ovE = res.overlay_enabled === true;
+      const state = res.channel_state || {};
+      const isReady = state[channel]?.isReady || false;
       const overlayEl = document.getElementById('kukoro-overlay');
       const players = (res.kukoro_data || {})[channel] || {};
       const allIds = Object.keys(players);
 
-      // MOSTRAR SEMPRE SE HABILITADO (mesmo sem dados)
       if (!ovE) { overlayEl.style.display = 'none'; return; }
       else overlayEl.style.display = 'flex';
+
+      const ovReadyBtn = document.getElementById('ov-ready-btn');
+      if (isReady) {
+        ovReadyBtn.style.opacity = '1'; ovReadyBtn.style.filter = 'grayscale(0)'; ovReadyBtn.style.textShadow = '0 0 5px #121212'; ovReadyBtn.title = t('tooltipStarted');
+      } else {
+        ovReadyBtn.style.opacity = '0.4'; ovReadyBtn.style.filter = 'grayscale(1)'; ovReadyBtn.style.textShadow = 'none'; ovReadyBtn.title = t('tooltipNotStarted');
+      }
 
       document.getElementById('ov-power-toggle').textContent = extE ? '🟢' : '🔴';
       document.getElementById('ov-disabled-overlay').style.display = extE ? 'none' : 'block';
@@ -284,7 +305,7 @@ function initOverlayLogic() {
         });
 
         if (p.isPending) {
-          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-weight:bold; color:#f0e6d2">@${p.name} [${t('statusAguardando')}]</div><div style="font-size:0.65em; color:#9e9e9e; background:#333; padding:2px 5px; border-radius:4px;">${t('statusPendente')}</div></div><div style="font-size:0.7em; color:#9e9e9e; margin-top:5px;">${t('msgPendingInfo')}</div><div style="display:flex; justify-content:flex-end; margin-top:5px;"><button class="ov-st-btn" style="padding:2px 6px; font-size:0.7em; background:#333; color:white; border:none; border-radius:3px; cursor:pointer;">${t('btnMorto')}</button></div>`;
+          card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-weight:bold; color:#f0e6d2">@${p.name} [${t('statusAguardando')}]</div><div style="font-size:0.65em; color:#9e9e9e; background:#333; padding:2px 5px; border-radius:4px;">${t('statusPendente')}</div></div><div style="font-size:0.7em; color:#9e9e9e; margin-top:5px;">${t('msgPendingInfo')}</div><div style="display:flex; justify-content:flex-end; margin-top:5px;"><button class="ov-st-btn" style="padding:2px 6px; font-size:0.7em; background:#333; color:white; border:none; border-radius:3px; cursor:pointer; font-weight:bold;">${t('btnMorto')}</button></div>`;
         } else {
           card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><div style="font-weight:bold; color:#f0e6d2; font-size:0.9em;">@${p.name} <span style="font-size:0.8em; color:#9e9e9e;">[Lv.${p.lv}]</span></div><div style="display:flex; gap:3px; flex-wrap:wrap; justify-content:flex-end; max-width:50%;">${labels.map(item => {
             let c = '#4db8ff'; if (item.id === 'Humanoid') c = '#d4af37'; if (item.id === 'Cursed') c = '#ff5252';
@@ -348,7 +369,7 @@ function initOverlayLogic() {
   };
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && (changes.extension_enabled || changes.overlay_enabled || changes.kukoro_data)) update();
+    if (area === 'local' && (changes.extension_enabled || changes.overlay_enabled || changes.kukoro_data || changes.channel_state)) update();
   });
 
   update();

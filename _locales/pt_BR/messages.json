@@ -60,6 +60,8 @@
   "showOverlayLabel": { "message": "Mostrar Overlay na Twitch" },
   "textSupportDev": { "message": "Apoie o desenvolvimento desta extensão:" },
   "btnTip": { "message": "Doar (Tip)" },
+  "tooltipStarted": { "message": "Iniciado" },
+  "tooltipNotStarted": { "message": "Marcar como Iniciado" },
   "tooltipClear": { "message": "Limpar Canal Rapidamente" },
   "tooltipPower": { "message": "Ligar/Desligar Extensão" },
   "tooltipMinimize": { "message": "Minimizar" },

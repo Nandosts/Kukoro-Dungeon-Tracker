@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const copyNicksBtn = document.getElementById('copy-nicks');
   const sortSelect = document.getElementById('sort-select');
   const overlaySwitch = document.getElementById('overlay-switch');
+  const readyBtn = document.getElementById('btn-ready');
 
   let currentChannel = 'unknown';
   let currentFilter = 'all'; // all, alive, dead
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     "Dragon": { sub: "Beast", keywords: ["Dragão", "Dragon", "Dragón", "Wyvern"] },
     "Gargoyle": { sub: "Cursed", keywords: ["Gárgula", "Gargoyle", "Gárgola", "Gargola"] },
     "Goblin": { sub: "Humanoid", keywords: ["Goblin", "Batedor Goblin", "Lanceiro Goblin", "Goblin Montado"] },
-    "Human": { sub: "Humanoid", keywords: ["Humano", "Human", "Jogador", "Player"] },
+    "Human": { sub: "Humanoid", keywords: ["Humano", "Human"] },
     "Imp": { sub: "Cursed", keywords: ["Diabrete", "Imp", "Diablillo", "Diabretezinho", "Diabrete Alado"] },
     "Lizard": { sub: "Beast", keywords: ["Lagarto", "Lizard", "Lizardo", "Lanceiro Lagarto", "Guarda Lagarto"] },
     "Minotaur": { sub: "Beast", keywords: ["Minotauro", "Minotaur", "Cavaleiro Minotauro", "Fera Minotauro"] },
@@ -117,6 +118,15 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.set({ overlay_enabled: overlaySwitch.checked });
   });
 
+  readyBtn.addEventListener('click', () => {
+    chrome.storage.local.get(['channel_state'], (res) => {
+      let state = res.channel_state || {};
+      if (!state[currentChannel]) state[currentChannel] = {};
+      state[currentChannel].isReady = !state[currentChannel].isReady;
+      chrome.storage.local.set({ channel_state: state });
+    });
+  });
+
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
       if (changes.extension_enabled) {
@@ -157,29 +167,45 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function verificarELimparInativos() {
-    chrome.storage.local.get(['kukoro_data', 'channel_activity'], (result) => {
+    chrome.storage.local.get(['kukoro_data', 'channel_activity', 'channel_state'], (result) => {
       let allData = result.kukoro_data || {};
       let activity = result.channel_activity || {};
+      let state = result.channel_state || {};
       const umaHoraEmMs = 60 * 60 * 1000;
       const agora = Date.now();
       let mudou = false;
       for (const ch in activity) {
         if (agora - activity[ch] > umaHoraEmMs) {
-          delete allData[ch]; delete activity[ch]; mudou = true;
+          delete allData[ch]; delete activity[ch]; delete state[ch]; mudou = true;
         }
       }
       if (currentChannel !== 'unknown') { activity[currentChannel] = agora; mudou = true; }
-      if (mudou) chrome.storage.local.set({ kukoro_data: allData, channel_activity: activity }, () => updateList());
+      if (mudou) chrome.storage.local.set({ kukoro_data: allData, channel_activity: activity, channel_state: state }, () => updateList());
     });
   }
 
   function updateList() {
-    chrome.storage.local.get(['kukoro_data'], (result) => {
+    chrome.storage.local.get(['kukoro_data', 'channel_state'], (result) => {
       const allData = result.kukoro_data || {};
+      const state = result.channel_state || {};
+      const isReady = state[currentChannel]?.isReady || false;
       const players = allData[currentChannel] || {};
       const searchTerm = searchInput.value.toLowerCase();
       const allIds = Object.keys(players);
       
+      // Update Ready Button state
+      if (isReady) {
+        readyBtn.style.opacity = '1';
+        readyBtn.style.filter = 'grayscale(0)';
+        readyBtn.style.textShadow = '0 0 5px #00ffcc';
+        readyBtn.title = t('tooltipStarted');
+      } else {
+        readyBtn.style.opacity = '0.4';
+        readyBtn.style.filter = 'grayscale(1)';
+        readyBtn.style.textShadow = 'none';
+        readyBtn.title = t('tooltipNotStarted');
+      }
+
       let detectedEnemies = new Set();
       allIds.forEach(id => {
         if (!players[id].isPending) identificarVantagens(players[id].skills).classes.forEach(c => detectedEnemies.add(c));
@@ -216,8 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
           const temClasseExata = v.classes.includes(currentEnemyFilter);
           const sL = (p.skills || "").toLowerCase();
           const subName = sub ? t(`sub${sub}`).toLowerCase() : "";
-          const temVantagemGenericaSub = sub && (sL.includes(subName) || (sub === "Humanoid" && (sL.includes("humanoide") || sL.includes("humanóide"))));
-          mE = temClasseExata || temVantagemGenericaSub;
+          const temGen = sub && (sL.includes(subName) || (sub === "Humanoid" && (sL.includes("humanoide") || sL.includes("humanóide"))));
+          mE = temClasseExata || temGen;
         }
         return mS && mSt && mE;
       });
@@ -304,14 +330,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function togglePlayerStatus(id) {
     chrome.storage.local.get(['kukoro_data'], res => {
       let d = res.kukoro_data || {}; if (d[currentChannel] && d[currentChannel][id]) {
-        d[currentChannel][id].isDead = !d[currentChannel][id].isDead; chrome.storage.local.set({ kukoro_data: d });
+        d[currentChannel][id].isDead = !d[currentChannel][id].isDead; chrome.storage.local.set({ kukoro_data: d }, updateList);
       }
     });
   }
 
   function clearChannelData() {
     chrome.storage.local.get(['kukoro_data'], res => {
-      let d = res.kukoro_data || {}; delete d[currentChannel]; chrome.storage.local.set({ kukoro_data: d });
+      let d = res.kukoro_data || {}; delete d[currentChannel]; chrome.storage.local.set({ kukoro_data: d }, updateList);
     });
   }
 
